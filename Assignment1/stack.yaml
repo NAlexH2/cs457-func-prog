@@ -1,0 +1,5 @@
+resolver: lts-20.6
+packages:
+  - .
+extra-deps:
+  - HUnit-1.6.2.0

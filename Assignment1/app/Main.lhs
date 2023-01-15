@@ -1,5 +1,5 @@
-Name: Put your name here
-Date: Put the date here
+Name: Alex Harris
+Date: 1/14/2023
 Assignment 1
 
 The following line contains a command that enables some special features of
@@ -61,10 +61,10 @@ check that your script works properly using 'stack build'.
 
 > -- | TODO: fix the code
 > n :: Int
-> n = a 'div' length xs
+> n = a div length xs
 >  where
 >     a = 10
->    xs = [1; 2]
+>     xs = [1, 2]
 
 Next, we have some code for testing if your implementation is correct. Your
 solution should successfully pass all tests.
@@ -85,14 +85,19 @@ Wthe definitions actually do as long as they are type correct.
 
 > -- | TODO: write down definitions that have the following types
 > bools :: [Bool]
->
+> bools = [_, _]
+
 > nums :: [[Int]]
->
+> nums = [[_], [_]]
+
 > add :: Int -> Int -> Int -> Int
->
+> add = _ + _ + _ + _
+
 > copy :: a -> (a, a)
->
+> copy (_, _) = a
+
 > apply :: (a -> b) -> a -> b
+> apply | b = a
 
 > --------------------------------------------------------------------------------
 > -- Problem (Functions, Part I)

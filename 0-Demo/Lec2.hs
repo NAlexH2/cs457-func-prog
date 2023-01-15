@@ -16,24 +16,24 @@ module Functions where
 
 -- Conditional expressions and guarded expressions
 -- absolute value
-    abs :: Int -> Int
-    abs x = if x >= 0 then x else -x
+    -- abs :: Int -> Int
+    -- abs x = if x >= 0 then x else -x
 
     -- Another way 
-    -- abs :: Int -> Int
-    -- abs x | x >= 0  = x 
-    --       | otherwise = -x
+    abs :: Int -> Int
+    abs x | x >= 0  = x 
+          | otherwise = -x
 
 -- reutrn 1 if the number is positive, -1 if negative, and 0 if 0
-    signum :: Int -> Int
-    signum x = if x > 0 then 1 else
-        if x < 0 then -1 else 0
+    -- signum :: Int -> Int
+    -- signum x = if x > 0 then 1 else
+    --     if x < 0 then -1 else 0
 
     -- Another way
-    -- signum :: Int -> Int
-    -- signum x | x > 0    = 1
-    --          | x < 0 = -1 
-    --          | otherwise = 0
+    signum :: Int -> Int
+    signum x | x > 0    = 1
+             | x < 0 = -1 
+             | otherwise = 0
 
 --Pattern Matching
 -- Boolean not

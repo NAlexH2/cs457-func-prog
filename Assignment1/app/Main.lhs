@@ -91,13 +91,13 @@ Wthe definitions actually do as long as they are type correct.
 > nums = [[1,2], [3,4]]
 
 > add :: Int -> Int -> Int -> Int
-> add = _ + _ + _ + _
+> add a b c = a + b + c
 
 > copy :: a -> (a, a)
-> copy (_, _) = a
+> copy a = (a, a)
 
 > apply :: (a -> b) -> a -> b
-> apply | b = a
+> apply b a = b $ a
 
 > --------------------------------------------------------------------------------
 > -- Problem (Functions, Part I)
@@ -154,8 +154,7 @@ defined in terms of the list functions shown above.
 > -- | Given a non-empty list, returns the last element in the list.
 > last :: [a] -> a
 > last [] = error "Empty List"
-> last [a] = [a]
-> last a = a !! (length a-1)
+> last (x:xs) = (x:xs) !! (length (x:xs)-1)
 
 Can you think of another possible definition?
 
@@ -163,7 +162,6 @@ Can you think of another possible definition?
 > -- | Given a non-empty list, returns the last element in the list.
 > lastAlt :: [a] -> a
 > lastAlt [] = error "Empty list"
-> lastAlt [a] = [a]
 > lastAlt a = reverse a !! 0
 
 The library function 'init' removes the last element from a non-empty list; for
@@ -173,15 +171,13 @@ be defined in two different ways.
 > -- | TODO: implement 'init'.
 > -- | Given a non-empty list, returns the the list without its last elements.
 > init :: [a] -> [a]
-> init [] = error "Empty list"
-> init [a] = [a] 
+> init [] = []
 > init (x:xs) = take (length (x:xs) - 1) (x:xs)
 
 > -- | TODO: implement 'init' in a different way.
 > -- | Given a non-empty list, returns the the list without its last elements.
 > initAlt :: [a] -> [a]
-> initAlt [] = error "Empty list"
-> initAlt [a] = [a] 
+> initAlt [] = []
 > initAlt (x:xs) = reverse (drop 1 (reverse (x:xs)))
 
 Your implementation should successfully pass all test cases when running 'stack
@@ -222,11 +218,13 @@ to consider the case that the input list has fewer than 3 elements):
 
 > -- | TODO: implement [third] using 'head' and 'tail'.
 > thirdV1 :: [a] -> a
+> thirdV1 myList = head (tail (tail myList))
 
 (ii) list indexing '!!':
 
 > -- | TODO: implement [third] using '!!'.
 > thirdV2 :: [a] -> a
+> thirdV2 myList = myList !! 2
 
 (iii) pattern matching:
 
@@ -236,6 +234,7 @@ about this warning for this function.
 
 > -- | TODO: implement [third] using pattern matching.
 > thirdV3 :: [a] -> a
+> thirdV3 (x:y:z:xs) = z
 
 Consider a function 'safetail :: [a] -> [a]' that behaves in the same way as
 'tail' except that it maps the empty list to itself rather than producing an
@@ -246,16 +245,24 @@ list is empty or not, define 'safetail' using:
 
 > -- | TODO: implement 'safetail' using a conditional expression
 > safetailV1 :: [a] -> [a]
+> safetailV1 myList =
+>             if null myList then []
+>             else tail myList
 
 (ii) guarded equations:
 
 > -- | TODO: implement 'safetail' using guarded equations
 > safetailV2 :: [a] -> [a]
+> safetailV2 myList | null myList = []
+>                   | otherwise   = drop 1 myList
 
 (iii) pattern matching:
 
 > -- | TODO: implement 'safetail' using pattern matching
 > safetailV3 :: [a] -> [a]
+> safetailV3 []                   = []
+> safetailV3 (_:xs) | null xs     = []
+>                   | otherwise   = xs
 
 > testThird :: (forall a. [a] -> a) -> String -> Test
 > testThird third msg = msg ~:

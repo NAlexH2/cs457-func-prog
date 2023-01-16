@@ -7,13 +7,13 @@ n = a `div` length xs
      a = 10
      xs = [1, 2]
 
-init :: [a] -> [a]
-init [] = error "Empty List"
-init [a] = [a]
-init (x:y) = 
+-- init :: [a] -> [a]
+-- init [] = error "Empty List"
+-- init [a] = [a]
+-- init (x:y) = 
 
 
-initAlt :: [a] -> [a]
-initAlt [] = error "Empty List"
-initAlt [a] = reverse [a]
-initAlt (x:y) = reverse (x : y)
+-- initAlt :: [a] -> [a]
+-- initAlt [] = error "Empty List"
+-- initAlt [a] = reverse [a]
+-- initAlt (x:y) = reverse (x : y)

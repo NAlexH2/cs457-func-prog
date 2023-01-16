@@ -85,10 +85,10 @@ Wthe definitions actually do as long as they are type correct.
 
 > -- | TODO: write down definitions that have the following types
 > bools :: [Bool]
-> bools = [_, _]
+> bools = [True, False]
 
 > nums :: [[Int]]
-> nums = [[_], [_]]
+> nums = [[1,2], [3,4]]
 
 > add :: Int -> Int -> Int -> Int
 > add = _ + _ + _ + _
@@ -126,8 +126,8 @@ lecture:
 
 Some examples can be found in the test cases below. We have not seen the '~?='
 operator before: it is basically an '==' operator with some extra support for
-printing error information. You should interpret 'head xs ~?= 1' as 'head xs' is
-expected to result in 1.
+printing error information. You should interpret 'head xs ~?= 1' as 'head xs' 
+is expected to result in 1.
 
 > -- | Examples of common list functions.
 > testList :: Test
@@ -153,14 +153,18 @@ defined in terms of the list functions shown above.
 > -- | TODO: implement 'last'.
 > -- | Given a non-empty list, returns the last element in the list.
 > last :: [a] -> a
-> last = a !! ([a] - 1)
+> last [] = error "Empty List"
+> last [a] = [a]
+> last a = a !! (length a-1)
 
 Can you think of another possible definition?
 
 > -- | TODO: implement 'last' in a different way.
 > -- | Given a non-empty list, returns the last element in the list.
 > lastAlt :: [a] -> a
-> lastAlt = a !! length [a]
+> lastAlt [] = error "Empty list"
+> lastAlt [a] = [a]
+> lastAlt a = reverse a !! 0
 
 The library function 'init' removes the last element from a non-empty list; for
 example, 'init [1, 2, 3, 4, 5] = [1, 2, 3, 4]'. Show how 'init' could similarly
@@ -169,12 +173,16 @@ be defined in two different ways.
 > -- | TODO: implement 'init'.
 > -- | Given a non-empty list, returns the the list without its last elements.
 > init :: [a] -> [a]
-> init (_:_) = take (length (_:_) - 1) (_:_)
+> init [] = error "Empty list"
+> init [a] = [a] 
+> init (x:xs) = take (length (x:xs) - 1) (x:xs)
 
 > -- | TODO: implement 'init' in a different way.
 > -- | Given a non-empty list, returns the the list without its last elements.
 > initAlt :: [a] -> [a]
-> initAlt _ = drop [a] !! [a] - 1
+> initAlt [] = error "Empty list"
+> initAlt [a] = [a] 
+> initAlt (x:xs) = reverse (drop 1 (reverse (x:xs)))
 
 Your implementation should successfully pass all test cases when running 'stack
 run Main'.

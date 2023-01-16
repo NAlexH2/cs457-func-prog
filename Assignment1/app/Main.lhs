@@ -52,16 +52,16 @@ Style is also important for getting a good grade in your assignments. Please
 refer to the Haskell Style Guide distributed on Canvas (under the "Modules"
 tab).
 
-> --------------------------------------------------------------------------------
+> -----------------------------------------------------------------------------
 > -- Problem (Syntax)
-> -------------------------------------------------------------------------------- >
+> -----------------------------------------------------------------------------
 
 The script below contains three syntactic errors. Correct these errors and then
 check that your script works properly using 'stack build'.
 
 > -- | TODO: fix the code
 > n :: Int
-> n = a div length xs
+> n = a `div` length xs
 >  where
 >     a = 10
 >     xs = [1, 2]
@@ -153,12 +153,14 @@ defined in terms of the list functions shown above.
 > -- | TODO: implement 'last'.
 > -- | Given a non-empty list, returns the last element in the list.
 > last :: [a] -> a
+> last = a !! ([a] - 1)
 
 Can you think of another possible definition?
 
 > -- | TODO: implement 'last' in a different way.
 > -- | Given a non-empty list, returns the last element in the list.
 > lastAlt :: [a] -> a
+> lastAlt = a !! length [a]
 
 The library function 'init' removes the last element from a non-empty list; for
 example, 'init [1, 2, 3, 4, 5] = [1, 2, 3, 4]'. Show how 'init' could similarly
@@ -167,10 +169,12 @@ be defined in two different ways.
 > -- | TODO: implement 'init'.
 > -- | Given a non-empty list, returns the the list without its last elements.
 > init :: [a] -> [a]
+> init (_:_) = take (length (_:_) - 1) (_:_)
 
 > -- | TODO: implement 'init' in a different way.
 > -- | Given a non-empty list, returns the the list without its last elements.
 > initAlt :: [a] -> [a]
+> initAlt _ = drop [a] !! [a] - 1
 
 Your implementation should successfully pass all test cases when running 'stack
 run Main'.

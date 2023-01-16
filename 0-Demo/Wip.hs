@@ -17,3 +17,12 @@ n = a `div` length xs
 -- initAlt [] = error "Empty List"
 -- initAlt [a] = reverse [a]
 -- initAlt (x:y) = reverse (x : y)
+
+
+last :: [a] -> a
+-- last a = head (last a)
+--   where
+--     last [] = []
+--     last [x] = [x]
+--     last (_:xs) = last xs
+last a = reverse a !! 0

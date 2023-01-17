@@ -172,13 +172,13 @@ be defined in two different ways.
 > -- | Given a non-empty list, returns the the list without its last elements.
 > init :: [a] -> [a]
 > init [] = []
-> init (x:xs) = take (length (x:xs) - 1) (x:xs)
+> init myList = take (length myList - 1) myList
 
 > -- | TODO: implement 'init' in a different way.
 > -- | Given a non-empty list, returns the the list without its last elements.
 > initAlt :: [a] -> [a]
 > initAlt [] = []
-> initAlt (x:xs) = reverse (drop 1 (reverse (x:xs)))
+> initAlt myList = reverse (drop 1 (reverse myList))
 
 Your implementation should successfully pass all test cases when running 'stack
 run Main'.
@@ -234,7 +234,7 @@ about this warning for this function.
 
 > -- | TODO: implement [third] using pattern matching.
 > thirdV3 :: [a] -> a
-> thirdV3 (x:y:z:xs) = z
+> thirdV3 (_:_:z:_) = z
 
 Consider a function 'safetail :: [a] -> [a]' that behaves in the same way as
 'tail' except that it maps the empty list to itself rather than producing an
@@ -304,31 +304,34 @@ everything.
 > -- Part One
 > -- | TODO: refactor the following code
 > abc :: Bool -> Bool -> Bool -> Bool
-> abc x y z =
->   if x then if y then True else
->        if (x && z) then True else False
->   else False
+> abc x y z | x && y = True
+>           | x && z = True
+>           | otherwise = False
 
 > tabc :: Test
 > tabc = "abc" ~: TestList [abc True False True  ~?= True,
 >                           abc True False False ~?= False,
->                           abc False True True  ~?= False]
+>                           abc False True True  ~?= False,
+>                           abc True True False  ~?= True]
+> -- I've added this last test to confirm my thoughts on the above code
+
 
 > -- Part Two
 > -- | TODO: refactor the following code
-> arithmetic :: ((Int, Int), Int) -> ((Int,Int), Int) -> (Int, Int, Int)
-> arithmetic x1 x2 =
->      let a = fst (fst x1) in
->      let b = snd (fst x1) in
->      let c = snd x1 in
->      let d = fst (fst x2) in
->      let e = snd (fst x2) in
->      let f = snd x2
->        in
->        ((((((b*f) - (c*e)), ((c*
->        d) - (a*f)
->        ), ((a*e)-(b*d))))))
->
+> arithmetic :: ((Int, Int), Int) -> ((Int, Int), Int) -> (Int, Int, Int)
+> arithmetic ((x1, y1), z1) ((x2, y2), z2) =
+>      ((y1*z2 - z1*y2), (z1*x2 - x1*z2), (x1*y2 - y1*x2))
+
+
+> -- I was reluctant to modify the test to better fit the code I originally had
+> -- What I wanted to do was remove the parens, but that required modifying the
+> -- test which doesn't seem right/fair/correc to do in this case. I've cleaned
+> -- it up but had I been given clear authority to modify the test to fit the 
+> -- newer format, it would have looked much better.
+> -- Here was the idea I had in mind:
+> -- arithmetic (x1, y1, z1) (x2, y2, z2) = ... -- rest of the soln provided
+> -- above
+
 > tarithmetic :: Test
 > tarithmetic = "arithmetic" ~:
 >    TestList[ arithmetic ((1,2),3) ((4,5),6) ~?= (-3,6,-3),

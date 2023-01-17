@@ -328,9 +328,8 @@ everything.
 > -- test which doesn't seem right/fair/correc to do in this case. I've cleaned
 > -- it up but had I been given clear authority to modify the test to fit the 
 > -- newer format, it would have looked much better.
-> -- Here was the idea I had in mind:
-> -- arithmetic (x1, y1, z1) (x2, y2, z2) = ... -- rest of the soln provided
-> -- above
+> -- Here was the idea I had in mind for the body of the function:
+> -- arithmetic (x1, y1, z1) (x2, y2, z2) = ... 
 
 > tarithmetic :: Test
 > tarithmetic = "arithmetic" ~:

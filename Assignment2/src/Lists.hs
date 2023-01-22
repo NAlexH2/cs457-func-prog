@@ -1,5 +1,5 @@
--- | Name: Put your name here
--- | Date: Put the date here
+-- | Name: Alex Harris
+-- | Date: 1/21/2023
 -- | Assignment 2
 
 module Lists (
@@ -48,11 +48,18 @@ runTests =  do
 -- do not know how to add test cases.)
 testGrid :: Test
 testGrid = "testGrid" ~: TestList
-  [ grid 1 2 ~?= [(0,0), (0,1), (0,2), (1,0), (1,1), (1,2)] ]
+    [ 
+        grid 1 2 ~?= [(0,0), (0,1), (0,2), (1,0), (1,1), (1,2)], 
+        grid 0 0 ~?= [(0,0)],
+        grid 5 0 ~?= [(0,0), (1,0), (2,0), (3,0), (4,0), (5,0)],
+        grid 0 5 ~?= [(0,0), (0,1), (0,2), (0,3), (0,4), (0,5)],
+        grid 1 1 ~?= [(0,0), (0,1), (1,0), (1,1)]
+    ]
 
 -- TODO: Implement the 'grid' function.
 grid :: Int -> Int -> [(Int, Int)]
-grid = error "Not implemented"
+grid x y = [(a,b) | a <- [0 .. x], b <- [0 .. y]]
+
 
 -- | Using a list comprehension and the function 'grid' above, define a function
 -- 'square :: Int -> [(Int, Int)]' that returns a coordinate square of size n,
@@ -62,11 +69,17 @@ grid = error "Not implemented"
 -- at least two more test cases here.
 testSquare :: Test
 testSquare = "testSquare" ~: TestList
-  [ square 2 ~?= [(0,1), (0,2), (1,0), (1,2), (2,0), (2,1)] ]
+    [ 
+        square 2 ~?= [(0,1), (0,2), (1,0), (1,2), (2,0), (2,1)], 
+        square 1 ~?= [(0,1), (1,0)],
+        square 3 ~?= [(0,1), (0,2), (0,3), (1,0), (1,2), (1,3),
+                      (2,0), (2,1), (2,3), (3,0), (3,1), (3,2)],
+        square 0 ~?= []
+    ]
 
 -- TODO: Implement the 'square' function.
 square :: Int -> [(Int, Int)]
-square = error "Not implemented"
+square sq = [(a,b) | a <- [0 .. sq], b <- [0 .. sq], a /= b]
 
 -- | In a similar way to the function 'length', show how the library function
 -- 'replicate :: Int -> a -> [a]' that produces a list of identical elements can
@@ -76,11 +89,14 @@ square = error "Not implemented"
 -- add at least two more test cases here.
 testReplicate :: Test
 testReplicate = "testReplicate" ~: TestList
-  [ replicate 3 True ~?= [True, True, True] ]
+    [ 
+        replicate 3 True ~?= [True, True, True], 
+        replicate 3 "1" ~?= ["1", "1", "1"]
+    ]
 
 -- TODO: Implement the 'replicate' function.
 replicate :: Int -> a -> [a]
-replicate = error "Not implemented"
+replicate n v = [v | _ <- [1 .. n]]
 
 -- | A triple (x, y, z) of positive integers is Pythagorean if it satisfies the
 -- equation x^2 + y^2 = z^2. Using a list comprehension with three generators,
@@ -97,6 +113,10 @@ testPyths = "testPyths" ~: TestList
 
 -- TODO: Implement the 'pyths' function.
 pyths :: Integer -> [(Integer, Integer, Integer)]
+-- All that is to say that a^2 + b^2 = some c^2
+-- 2^2 + 4^2 = 20 however there is no whole number s.t. x^2 = 20
+-- but 3^2 + 4^2 = 5^2 does work because 9 + 16 = 25, and 5 is the square of 25
+-- therefore, make a list that finds these things
 pyths = error "Not implemented"
 
 -- | A positive integer is prefect if it equals to the sum of all of its

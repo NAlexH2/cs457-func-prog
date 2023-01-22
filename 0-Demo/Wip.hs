@@ -1,11 +1,20 @@
 module Wip where
-import Prelude hiding (last, init)
+import Prelude hiding (last, init, replicate)
 
-n :: Int
-n = a `div` length xs
-  where
-     a = 10
-     xs = [1, 2]
+grid :: Int -> Int -> [(Int, Int)]
+grid x y = [(a,b) | a <- [0 .. x], b <- [0 .. y]]
+
+square :: Int -> [(Int, Int)]
+square sq = [(a,b) | a <- [0 .. sq], b <- [0 .. sq], a /= b]
+
+replicate :: Int -> a -> [a]
+replicate n v = [v | _ <- [1 .. n]]
+
+-- n :: Int
+-- n = a `div` length xs
+--   where
+--      a = 10
+--      xs = [1, 2]
 
 -- init :: [a] -> [a]
 -- init [] = error "Empty list"
@@ -28,29 +37,29 @@ n = a `div` length xs
 --     last (_:xs) = last xs
 -- last a = reverse a !! 
 
-thirdV1 :: [a] -> a
-thirdV1 myList = head (tail (tail myList))
+-- thirdV1 :: [a] -> a
+-- thirdV1 myList = head (tail (tail myList))
 
-thirdV2 :: [a] -> a
-thirdV2 myList = myList !! 2
+-- thirdV2 :: [a] -> a
+-- thirdV2 myList = myList !! 2
 
-thirdV3 :: [a] -> a
-thirdV3 (x:y:z:xs) = z
+-- thirdV3 :: [a] -> a
+-- thirdV3 (x:y:z:xs) = z
 
-last :: [a] -> a
-last [] = error "Empty list"
-last myList = myList !! (length myList - 1)
+-- last :: [a] -> a
+-- last [] = error "Empty list"
+-- last myList = myList !! (length myList - 1)
 
-safetailV1 :: [a] -> [a]
-safetailV1 myList =
-            if null myList then []
-            else tail myList
+-- safetailV1 :: [a] -> [a]
+-- safetailV1 myList =
+--             if null myList then []
+--             else tail myList
 
-safetailV2 :: [a] -> [a]
-safetailV2 myList | null myList = []
-                  | otherwise   = drop 1 myList
+-- safetailV2 :: [a] -> [a]
+-- safetailV2 myList | null myList = []
+--                   | otherwise   = drop 1 myList
 
-safetailV3 :: [a] -> [a]
-safetailV3 []                   = error "Empty list"
-safetailV3 (_:xs) | null xs     = []
-                  | otherwise   = xs
+-- safetailV3 :: [a] -> [a]
+-- safetailV3 []                   = error "Empty list"
+-- safetailV3 (_:xs) | null xs     = []
+                --   | otherwise   = xs

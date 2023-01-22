@@ -91,7 +91,10 @@ testReplicate :: Test
 testReplicate = "testReplicate" ~: TestList
     [ 
         replicate 3 True ~?= [True, True, True], 
-        replicate 3 "1" ~?= ["1", "1", "1"]
+        replicate 3 "1" ~?= ["1", "1", "1"],
+        replicate 1 "a" ~?= ["a"],
+        replicate 2 "aa" ~?= ["aa", "aa"],
+        replicate 0 True ~?= []
     ]
 
 -- TODO: Implement the 'replicate' function.

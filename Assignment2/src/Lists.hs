@@ -117,7 +117,7 @@ testPyths = "testPyths" ~: TestList
 -- TODO: Implement the 'pyths' function.
 pyths :: Integer -> [(Integer, Integer, Integer)]
 -- All that is to say that a^2 + b^2 = some c^2
--- 2^2 + 4^2 = 20 however there is no whole number s.t. x^2 = 20
+-- 2^2 + 3^2 = 13 however there is no whole number s.t. x^2 = 13
 -- but 3^2 + 4^2 = 5^2 does work because 9 + 16 = 25, and 5 is the square of 25
 -- therefore, make a list that finds these things
 pyths = error "Not implemented"
@@ -140,7 +140,7 @@ perfects :: Int -> [Int]
 perfects = error "Not implemented"
   where
     factors :: Int -> [Int]
-    factors n = [x | x <- [1..n], x `div` n == 0]
+    factors n = [x | x <- [1..n], x `mod` n == 0]
 
 -- | The scalar product of two list of integers xs and ys of length n is given
 -- by the sum of the products of corresponding integers. For example, a scalar

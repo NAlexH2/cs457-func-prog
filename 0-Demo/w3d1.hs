@@ -1,4 +1,5 @@
-import Distribution.Types.ForeignLib (libVersionNumberShow)
+module W3D1 where
+import Prelude hiding (reverse, zip, drop, odd, even, product)
 
 -- Type Declaration
 -------------------
@@ -89,7 +90,7 @@ f x y = case (safeDiv x y) of
 -- Inductive step: if n is a natural number, then (Succ n) is also a natural
 -- number
 
-data Nat = Zero | Succ Nat
+-- data Nat = Zero | Succ Nat
 
 nat2int :: Nat -> Int
 nat2int Zero     = 0
@@ -119,7 +120,7 @@ len (_ : xs) = 1 + len xs
 
 
 -- Binary Tree
-data Tree a = Leaf a | Node (Tree l) y (Tree r)
+data Tree a = Leaf a | Node (Tree a) a (Tree a)
     deriving Show
 
 t :: Tree Int
@@ -139,3 +140,57 @@ occurs x (Leaf y)     = x == y
 occurs x (Node l y r) | x == y    = True
                       | x < y     = occurs x l 
                       | otherwise = occurs x r
+
+-- reverse
+-- reverse :: [a] -> [a]
+-- reverse [] = []
+-- reverse (x:xs) = reverse xs ++ [x]
+
+insert :: Ord a => a -> [a] -> [a]
+insert x [] = [x]
+insert x (y:ys) | x <= y    = x : y : ys
+                | otherwise = y : insert x ys
+
+isort :: Ord a => [a] -> [a]
+isort [] = []
+isort (x:xs) = insert x $ isort xs
+
+
+
+-- Recursion on multiple arguments
+----------------------------------
+zip :: [a] -> [b] -> [(a, b)]
+zip (x:xs) (y:ys) = (x, y) : zip xs ys
+zip _ _ = []
+
+drop :: Int -> [a] -> [a]
+drop 0 xs = xs
+drop _ [] = []
+drop n (x:xs) | n > 0 = drop (n-1) xs
+              | otherwise = []
+
+-- Mutual Recursion
+----------------------------------
+
+data Nat = Zero | Succ Nat
+even :: Nat -> Bool
+even Zero = True
+even (Succ n) = odd n
+
+odd :: Nat -> Bool
+odd Zero = False
+odd (Succ n) = even n
+
+{--
+Steps on defining recursive functions:
+
+1. Define the type
+2. Enumerate the cases
+3. Define the simple cases
+4. Define the other cases
+5. Generalize and Simplify
+--}
+
+product :: Num a => [a] -> a
+product []      = 1
+product (x:xs)  = x * product xs

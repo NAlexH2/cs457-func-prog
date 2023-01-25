@@ -112,15 +112,17 @@ replicate n v = [v | _ <- [1 .. n]]
 -- least two more test cases here.
 testPyths :: Test
 testPyths = "testPyths" ~: TestList
-  [ pyths 10 ~?= [(3,4,5), (4,3,5), (6,8,10), (8,6,10)] ]
+  [ pyths 10 ~?= [(3,4,5), (4,3,5), (6,8,10), (8,6,10)],
+    pyths 0  ~?= [],
+    pyths 1  ~?= [],
+    pyths 2  ~?= [],
+    pyths 5  ~?= [(3,4,5), (4,3,5)],
+    pyths 14 ~?= [(3,4,5), (4,3,5), (5,12,13), (6,8,10), (8,6,10), (12,5,13)] 
+  ]
 
 -- TODO: Implement the 'pyths' function.
 pyths :: Integer -> [(Integer, Integer, Integer)]
--- All that is to say that a^2 + b^2 = some c^2
--- 2^2 + 3^2 = 13 however there is no whole number s.t. x^2 = 13
--- but 3^2 + 4^2 = 5^2 does work because 9 + 16 = 25, and 5 is the square of 25
--- therefore, make a list that finds these things
-pyths = error "Not implemented"
+pyths n = [ (x,y,z) | x <- [1..n], y <- [1..n], z <- [1..n], x^2 + y^2 == z^2 ]
 
 -- | A positive integer is prefect if it equals to the sum of all of its
 -- factors, excluding the number itself. Using a list comprehension and the
@@ -132,15 +134,20 @@ pyths = error "Not implemented"
 -- at least two more test cases here.
 testPerfects :: Test
 testPerfects = "testPerfects" ~: TestList
-  [ perfects 500 ~?= [6, 28, 496] ]
+  [ 
+    perfects 500  ~?= [6, 28, 496],
+    perfects 5    ~?= [],
+    perfects 8200 ~?= [6, 28, 496, 8128]
+  ]
+  -- This last test runs for a long time... At least on PSU servers
 
 -- TODO: Implement the 'perfects' function. Note: I have planted a bug in the
 -- implementation of 'factors', can you spot it?
 perfects :: Int -> [Int]
-perfects = error "Not implemented"
+perfects k = [l | l <- [1..k], l == sum(init(factors l))]
   where
     factors :: Int -> [Int]
-    factors n = [x | x <- [1..n], x `mod` n == 0]
+    factors n = [x | x <- [1..n], n `mod` x == 0]
 
 -- | The scalar product of two list of integers xs and ys of length n is given
 -- by the sum of the products of corresponding integers. For example, a scalar

@@ -1,5 +1,15 @@
 module W3D1 where
-import Prelude hiding (reverse, zip, drop, odd, even, product)
+import Prelude hiding (reverse, zip, drop, odd, even, product, init)
+
+{--
+Steps on defining recursive functions:
+
+1. Define the type
+2. Enumerate the cases
+3. Define the simple cases
+4. Define the other cases
+5. Generalize and Simplify
+--}
 
 -- Type Declaration
 -------------------
@@ -169,6 +179,12 @@ drop _ [] = []
 drop n (x:xs) | n > 0 = drop (n-1) xs
               | otherwise = []
 
+qsort :: Ord a => [a] -> [a]
+qsort [] = []
+qsort (x:xs) = qsort smallers ++ [x] ++ largers
+        where smallers = [y | y <- xs, y <= x]
+              largers  = [y | y <- xs, y > x]
+
 -- Mutual Recursion
 ----------------------------------
 
@@ -192,5 +208,42 @@ Steps on defining recursive functions:
 --}
 
 product :: Num a => [a] -> a
-product []      = 1
-product (x:xs)  = x * product xs
+product = foldr (*) 1
+-- product []      = 1
+-- product (x:xs)  = x * product xs
+
+-- All elements from even positions:
+
+evens :: [a] -> [a]
+evens xs = evens xs
+      where
+      evens' [] = []
+      evens' (x:xs) = x : odds' xs
+      odds' [] = []
+      odds' (_:xs) = evens' xs
+
+-- evens []     = []
+-- evens (x:xs) = x : odds xs
+
+-- odds :: [a] -> [a]
+-- odds []     = []
+-- odds (_:xs) = evens xs
+
+
+-- Exercisese on recursion
+----------------------------------
+
+{--
+Steps on defining recursive functions:
+
+1. Define the type
+2. Enumerate the cases
+3. Define the simple cases
+4. Define the other cases
+5. Generalize and Simplify
+--}
+
+init :: [a] -> [a]
+init [] = []
+init [_] = [] -- one item, drop it, return empty list
+init (x:xs) = x : init xs

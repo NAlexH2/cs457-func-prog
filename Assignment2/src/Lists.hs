@@ -162,11 +162,20 @@ perfects k = [l | l <- [1..k], l == sum(init(factors l))]
 -- returns---as long as it does not cause a runtime error.
 testScalarProduct :: Test
 testScalarProduct = "testScalarProduct" ~: TestList
-  [ scalarProduct [1,2,3] [4,5,6] ~?= 32 ]
+  [ 
+    scalarProduct [1,2,3] [4,5,6]   ~?= 32, 
+    scalarProduct [] []             ~?= 0,
+    scalarProduct [] [1,2,3]        ~?= 0,
+    scalarProduct [1,2,3] []        ~?= 0,
+    scalarProduct [1,2,3] [4,5]     ~?= 0,
+    scalarProduct [1,2,3] [1,2,3]   ~?= 14
+  ]
 
 -- TODO: Implement the 'scalaProduct' function.
 scalarProduct :: [Int] -> [Int] -> Int
-scalarProduct = error "Not implemented"
+scalarProduct l1 l2 | l1 == [] || l2 == []    = 0
+                    | length l1 /= length l2  = 0
+                    | otherwise               = sum [x * y | (x,y) <- zip l1 l2] 
 
 -- | If you are happy with your test cases and your implementation, you can run
 -- 'stack run --' or 'stack run Main' to run all your tests. If you are happy

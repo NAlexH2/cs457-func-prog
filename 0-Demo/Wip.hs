@@ -1,5 +1,5 @@
 module Wip where
-import Prelude hiding (last, init, replicate)
+import Prelude hiding (last, replicate)
 
 grid :: Int -> Int -> [(Int, Int)]
 grid x y = [(a,b) | a <- [0 .. x], b <- [0 .. y]]
@@ -10,11 +10,18 @@ square sq = [(a,b) | a <- [0 .. sq], b <- [0 .. sq], a /= b]
 replicate :: Int -> a -> [a]
 replicate n v = [v | _ <- [1 .. n]]
 
--- n :: Int
--- n = a `div` length xs
---   where
---      a = 10
---      xs = [1, 2]
+pyths :: Integer -> [(Integer, Integer, Integer)]
+pyths n = [ (x,y,z) | x <- [1..n], y <- [1..n], z <- [1..n], x^2 + y^2 == z^2 ]
+
+perfects :: Int -> [Int]
+perfects k = [l | l <- [1..k], l == sum(init(factors l))]
+  where
+    factors :: Int -> [Int]
+    factors n = [x | x <- [1..n], n `mod` x == 0]
+
+scalarProduct :: [Int] -> [Int] -> Int
+scalarProduct l1 l2 = sum [x * y | (x,y) <- zip l1 l2]  
+
 
 -- init :: [a] -> [a]
 -- init [] = error "Empty list"

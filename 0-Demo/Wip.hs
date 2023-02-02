@@ -1,12 +1,12 @@
 module Wip where
-import Prelude hiding (transpose)
+import Prelude hiding (transpose, concat)
 
 
 concat :: [[a]] -> [a]
 concat [[],[],[]] = []
 concat [[]] = []
 concat [] = []
-concat xs = foldr (\x r -> foldr )
+concat (x:xs) = foldr (\y r -> y:xs) [] concat xs
 
 
 endsWith :: String -> String -> Bool

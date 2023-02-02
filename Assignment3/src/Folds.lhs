@@ -1,5 +1,5 @@
-Name: Put your name here
-Date: Put the date here
+Name: Alex Harris
+Date: 1/30/2023
 Assignment 3
 
 (If you have not finished 'Lists.hs', stop here and make sure you finish that
@@ -48,7 +48,14 @@ it yourself.
 > concat = undefined
 
 > tconcat :: Test
-> tconcat = "concat" ~: (assertFailure "testcase for concat" :: Assertion)
+> tconcat = "concat" ~: TestList
+>     [
+>       concat [[],[],[]] ~?= [],
+>       concat [[1,2,3],[4,5,6],[7,8,9]] ~?= [1,2,3,4,5,6,7,8,9],
+>       concat [[1,2],[3,4],[]] ~?= [1,2,3,4],
+>       concat [[1,2],[],[3,4]] ~?= [1,2,3,4],
+>       concat [[],[1,2],[3,4]]
+>     ]
 
 > -- | The 'startsWith' function takes two strings and returns 'True'
 > -- iff the first is a prefix of the second.

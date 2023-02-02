@@ -1,5 +1,5 @@
-Name: Put your name here
-Date: Put the date here
+Name: Alex Harris
+Date: 1/30/2023
 Assignment 3
 
 > module Lists
@@ -14,7 +14,7 @@ Assignment 3
 >        testLists) where
 > import Prelude hiding (reverse, zip)
 > import Test.HUnit
-
+  
 > --------------------------------------------------------------------------------
 > -- Problem (Good Style)
 > --------------------------------------------------------------------------------
@@ -39,21 +39,38 @@ those bound by let and where) can and should be renamed.
 NOTE: If you have set up VSCode and hlint correctly, your IDE should give you a
 few hints on how to improve these functions. But, it won't tell you everything.
 
+> -- OLD:
+> -- reverse :: [a] -> [a]
+> -- reverse l  = reverseAux l [] where
+> --   reverseAux l acc =
+> --     if null l then acc
+> --        else reverseAux (tail l) (head l : acc)
+
+> -- NEW:
 > reverse :: [a] -> [a]
-> reverse l  = reverseAux l [] where
->   reverseAux l acc =
->     if null l then acc
->        else reverseAux (tail l) (head l : acc)
+> reverse l  = reverseAux l []
+>   where
+>       reverseAux l acc | null l    = acc
+>                        | otherwise = reverseAux (tail l) (head l : acc)
 
 > treverse :: Test
 > treverse = "reverse" ~: TestList
 >     [reverse [3,2,1] ~?= ([1,2,3] :: [Int]),
 >      reverse [1]     ~?= ([1]     :: [Int]) ]
 
+> -- OLD:
+> -- zip :: [a] -> [b] -> [(a, b)]
+> -- zip xs ys = g 0 xs ys where
+> --   g n xs ys = if n == length xs || n == length ys then [] else
+> --           (xs !! n, ys !! n) : g (n + 1) xs ys
+
+> -- NEW:
 > zip :: [a] -> [b] -> [(a, b)]
-> zip xs ys = g 0 xs ys where
->   g n xs ys = if n == length xs || n == length ys then [] else
->           (xs !! n, ys !! n) : g (n + 1) xs ys
+> zip xs ys = g 0 xs ys 
+>   where
+>       g n xs ys | n == length xs || n == length ys = []
+>                 | otherwise = (xs !! n, ys !! n) : g (n + 1) xs ys
+
 
 > tzip :: Test
 > tzip = "zip" ~:
@@ -97,11 +114,20 @@ comprehension syntax, as it actually de-sugars into library functions!
 > -- >>> minumumMaybe [2,1,3]
 > -- Just 1
 > minimumMaybe :: [Int] -> Maybe Int
-> minimumMaybe = undefined
+> minimumMaybe [] = Nothing
+> minimumMaybe (x:xs) = case minimumMaybe xs of
+>                       Nothing -> Just x
+>                       Just y -> if x < y then Just x
+>                                 else Just y
 
 > tminimumMaybe :: Test
-> tminimumMaybe =
->    "minimumMaybe" ~: (assertFailure "testcases for minimumMaybe" :: Assertion)
+> tminimumMaybe = "minimumMaybe" ~: TestList 
+>      [ 
+>        minimumMaybe [] ~?= Nothing,
+>        minimumMaybe [2,1,3] ~?= Just 1,
+>        minimumMaybe [9,9,9,9] ~?= Just 9,
+>        minimumMaybe [999, 1, 9, 100, 4, 4, 1] ~?= Just 1
+>      ]
 
 
 > -- Part Two
@@ -113,11 +139,22 @@ comprehension syntax, as it actually de-sugars into library functions!
 > --
 > -- >>> "Hello" `startsWith` "Wello Horld!"
 > -- False
-> startsWith :: String -> String -> Bool
-> startsWith = undefined
+> startsWith [] [] = True
+> startsWith  _ [] = False
+> startsWith []  _ = False
+> startsWith (x : xs) (y : ys)  | x == y && xs == ""  = True
+>                               | x == y              = startsWith xs ys
+>                               | otherwise           = False
 
 > tstartsWith :: Test
-> tstartsWith = "startsWith" ~: (assertFailure "testcase for startsWith" :: Assertion)
+> tstartsWith = "startsWith" ~: TestList
+>       [
+>         startsWith "" ""                  ~?= True,
+>         startsWith "" "Hello World!"      ~?= False,
+>         startsWith "Hello" ""             ~?= False,
+>         startsWith "Hello" "Hello World!" ~?= True,
+>         startsWith "Hello" "Wello World!" ~?= False
+>       ]
 
 
 > -- Part Three
@@ -131,10 +168,28 @@ comprehension syntax, as it actually de-sugars into library functions!
 > -- >>> "World" `endsWith` "Hello World!"
 > -- False
 > endsWith :: String -> String -> Bool
-> endsWith = undefined
+> endsWith [] []                        = True
+> endsWith  _ []                        = True
+> endsWith []  _                        = False
+> endsWith xs (y:ys)  | strEq xs (y:ys) = True
+>                     | otherwise       = endsWith xs ys
+>     where
+>       strEq :: String -> String -> Bool
+>       strEq [] []                     = True
+>       strEq (x:xs) (y:ys) | x == y    = strEq xs ys
+>                           | otherwise = False
+>       strEq _ _                       = False
 
 > tendsWith :: Test
-> tendsWith = "endsWith" ~: (assertFailure "testcase for endsWith" :: Assertion)
+> tendsWith = "endsWith" ~: TestList
+>      [
+>         endsWith "" ""                    ~?= True,
+>         endsWith "" "Hello World!"        ~?= True,
+>         endsWith "World!" ""              ~?= False,
+>         endsWith "ld!" "Hello World!"     ~?= True,
+>         endsWith "World" "Hello World!"   ~?= True,
+>         endsWith "World!" "Hello World!"  ~?= True
+>      ]
 
 
 > -- Part Four
@@ -158,8 +213,14 @@ comprehension syntax, as it actually de-sugars into library functions!
 > transpose = undefined
 
 > ttranspose :: Test
-> ttranspose = "transpose" ~: (assertFailure "testcase for transpose" :: Assertion)
-
+> ttranspose = "transpose" ~: TestList
+>      [
+>         transpose []                 ~?= [],
+>         transpose [[]]               ~?= [],
+>         transpose [[3,4,5]]          ~?= [[3],[4],[5]],
+>         transpose [[1,2,3],[4,5,6]]  ~?= [[1,4],[2,5],[3,6]],
+>         transpose [[1,2],[3,4,5]]    ~?= [[1,3],[2,4]]
+>      ]
 
 > -- Part Five
 > -- | The 'countSub' function returns the number of (potentially overlapping)

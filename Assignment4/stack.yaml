@@ -1,0 +1,6 @@
+resolver: lts-20.8
+packages:
+  - .
+extra-deps:
+  - HUnit-1.6.2.0
+  - QuickCheck-2.14.2

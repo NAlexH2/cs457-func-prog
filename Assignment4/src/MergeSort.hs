@@ -1,5 +1,5 @@
--- | Name: Put your name here
--- | Date: Put the date here
+-- | Name: Alex Harris
+-- | Date: 2/4/2023
 -- | Assignment 4
 
 {-# LANGUAGE FlexibleInstances #-}

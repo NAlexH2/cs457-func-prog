@@ -1,26 +1,80 @@
+{-# LANGUAGE InstanceSigs #-}
 module Wip where
-import Prelude hiding (transpose, concat)
+import Prelude hiding (foldr, length, filter, minimum)
+import qualified Data.List as List
 
 
-concat :: [[a]] -> [a]
-concat [[],[],[]] = []
-concat [[]] = []
-concat [] = []
-concat (x:xs) = foldr (\y r -> y:xs) [] concat xs
+newtype SortedList a = SL [a] deriving (Eq, Show)
 
-
-endsWith :: String -> String -> Bool
-endsWith [] [] = True
-endsWith  _ [] = True
-endsWith []  _ = False
-endsWith xs (y:ys)  | strEq xs (y:ys) = True
-                    | otherwise = endsWith xs ys
+minimum :: SortedList a -> Maybe a
+minimum a = Just ((toList a) !! 0)
+instance Ord a => Monoid (SortedList a) where
+  mappend :: Ord a => SortedList a -> SortedList a -> SortedList a
+  l1 `mappend` l2 = SL (myAppend (toList l1) (toList l2))
     where
-      strEq :: String -> String -> Bool
-      strEq [] [] = True
-      strEq (x:xs) (y:ys) | x == y = strEq xs ys
-                          | otherwise = False
-      strEq _ _ = False
+      myAppend xs [] = xs
+      myAppend [] ys = ys
+      myAppend (x:xs) (y:ys)  | x <= y = x : myAppend xs (y:ys)
+                              | otherwise = y : myAppend (x:xs) ys    
+  mempty :: Ord a => SortedList a
+  mempty = SL []
+
+instance Ord a => Semigroup (SortedList a) where
+  (<>) :: Ord a => SortedList a -> SortedList a -> SortedList a
+  (<>) = mappend
+
+
+foldList :: Monoid b => [b] -> b
+foldList = List.foldr mappend mempty
+
+-- | convert to a regular list. The elements should be produced in order.
+toList :: SortedList a -> [a]
+toList (SL as) = as
+
+-- | convert from a regular list.
+fromList :: Ord a => [a] -> SortedList a
+fromList = foldList . map singleton
+
+{-
+Some of the operations that we define for sorted lists just delegate
+to the version for regular lists.
+-}
+
+-- | construct a sorted list containing a single element
+singleton :: a -> SortedList a
+singleton a = SL [a]
+
+-- | reduce a SortedList in order
+foldr :: (a -> b -> b) -> b -> SortedList a -> b
+foldr f b (SL xs) = List.foldr f b xs
+
+-- | decide which elements of the sorted list to keep
+filter :: (a -> Bool) -> SortedList a -> SortedList a
+filter f (SL xs) = SL (List.filter f xs)
+
+-- | count the number of elements in the sorted list
+length :: SortedList a -> Int
+length (SL xs) = List.length xs
+
+-- concat :: [[a]] -> [a]
+-- concat [[],[],[]] = []
+-- concat [[]] = []
+-- concat [] = []
+-- concat (x:xs) = foldr (\y r -> y:xs) [] concat xs
+
+
+-- endsWith :: String -> String -> Bool
+-- endsWith [] [] = True
+-- endsWith  _ [] = True
+-- endsWith []  _ = False
+-- endsWith xs (y:ys)  | strEq xs (y:ys) = True
+--                     | otherwise = endsWith xs ys
+--     where
+--       strEq :: String -> String -> Bool
+--       strEq [] [] = True
+--       strEq (x:xs) (y:ys) | x == y = strEq xs ys
+--                           | otherwise = False
+--       strEq _ _ = False
 
 
 -- Things you've thought about and tried...
@@ -32,21 +86,21 @@ endsWith xs (y:ys)  | strEq xs (y:ys) = True
 ----    backwards from there.
 
 
-startsWith :: String -> String -> Bool
-startsWith [] [] = True
-startsWith _ [] = False
-startsWith [] _ = True
-startsWith (x : xs) (y : ys)  | x == y && xs == "" = True
-                              | x == y = startsWith xs ys
-                              | otherwise = False
+-- startsWith :: String -> String -> Bool
+-- startsWith [] [] = True
+-- startsWith _ [] = False
+-- startsWith [] _ = True
+-- startsWith (x : xs) (y : ys)  | x == y && xs == "" = True
+--                               | x == y = startsWith xs ys
+--                               | otherwise = False
 
 
-minimumMaybe :: [Int] -> Maybe Int
-minimumMaybe [] = Nothing
-minimumMaybe (x:xs) = case minimumMaybe xs of
-              Nothing -> Just x
-              Just y -> if x < y then Just x
-                        else Just y
+-- minimumMaybe :: [Int] -> Maybe Int
+-- minimumMaybe [] = Nothing
+-- minimumMaybe (x:xs) = case minimumMaybe xs of
+--               Nothing -> Just x
+--               Just y -> if x < y then Just x
+--                         else Just y
 
   -- where 
   --   minimumAux :: [Int] -> Int

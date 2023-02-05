@@ -1,5 +1,5 @@
--- | Name: Put your name here
--- | Date: Put the date here
+-- | Name: Alex Harris
+-- | Date: 2/4/2023
 -- | Assignment 4
 
 {-# LANGUAGE FlexibleInstances #-}
@@ -263,8 +263,15 @@ be able to do.
 
 -- TODO: define the following instance
 instance Ord a => Monoid (SortedList a) where
-  l1 `mappend` l2 = undefined
-  mempty = undefined
+  -- mappend :: Ord a => SortedList a -> SortedList a -> SortedList a
+  l1 `mappend` l2 = SL (myAppend (toList l1) (toList l2))
+    where
+      myAppend xs [] = xs
+      myAppend [] ys = ys
+      myAppend (x:xs) (y:ys)  | x <= y = x : myAppend xs (y:ys)
+                              | otherwise = y : myAppend (x:xs) ys    
+  -- mempty :: Ord a => SortedList a
+  mempty = SL []
 
 instance Ord a => Semigroup (SortedList a) where
   (<>) = mappend
@@ -284,7 +291,11 @@ testSortedList =
              mempty `mappend` t1 ~?= t1,          -- left identity
              t1 `mappend` mempty ~?= t1,          -- right identity
              (t1 `mappend` t2) `mappend` t3 ~?=
-                t1 `mappend` (t2 `mappend` t3)    -- associativity
+                t1 `mappend` (t2 `mappend` t3),    -- associativity
+             t1 `mappend` t2 ~?= SL [1,2,4,5],
+             t1 `mappend` t1 ~?= SL [2,2,4,4],
+             t2 `mappend` t2 ~?= SL [1,1,5,5],
+             t1 `mappend` (t2 `mappend` t3) ~?= SL [1,2,2,3,4,5]
            ]
 
 ---------------------------------------------------------
@@ -314,7 +325,8 @@ as the `minimum` function in the standard library.)
 
 -- TODO: define the following function.
 minimum :: SortedList a -> Maybe a
-minimum = undefined
+minimum (SL []) = Nothing
+minimum a = Just ((toList a) !! 0)
 
 testMinimum :: Test
 testMinimum =

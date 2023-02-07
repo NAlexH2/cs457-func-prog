@@ -28,7 +28,10 @@ function).
 
 -- TODO: define the following function
 insert :: Ord a => a -> [a] -> [a]
-insert = undefined
+insert a [] = [a]
+insert a [x] = if a >= x then x:[a] else a:[x]
+insert a (b:c:cs) | a >= b && a <= c = b:a:c:cs
+                  | otherwise = b : c : insert a cs
 
 {-
 Using this function, we can define the *insertion sort* algorithm over lists.
@@ -41,7 +44,8 @@ You must express your answer in terms of a fold.
 
 -- TODO: define the following function
 insertionSort :: Ord a => [a] -> [a]
-insertionSort = undefined
+insertionSort a = foldr insert [] a
+      
 
 {-
 Keep in mind that this sorting algorithm, although succinct, is not
@@ -120,7 +124,7 @@ In order to make this work, you need to define the `foldMapList` combinator.
 
 -- TODO: define the following function
 foldMapList :: Monoid m => (a -> m) -> [a] -> m
-foldMapList f = undefined
+foldMapList f a = foldMap f a
 
 {-
 The type of `foldMapList` is very general---we can use this function to combine
@@ -139,7 +143,7 @@ explicit recursion.
 
 -- TODO: define the following function
 sumOfProducts :: Num a => [[a]] -> a
-sumOfProducts = undefined
+sumOfProducts a = foldMapList Sum [Product xs | xs <- a]
 
 testSumOfProducts :: Test
 testSumOfProducts = sumOfProducts [[1],[2,3],[4,5,6],[7,8,9,10]] ~?= (5167 :: Int)

@@ -2,11 +2,59 @@
 module Wip where
 import Prelude hiding (foldr, length, filter, minimum)
 import qualified Data.List as List
+import Data.Monoid
 
 
 newtype SortedList a = SL [a] deriving (Eq, Show)
+sumOfProducts :: Num a => [[a]] -> a
+sumOfProducts a = getSum foldMapList getProduct [x | xs <- a, x <- xs]
+
+ten :: Int
+ten = getSum (foldList (map Sum [1,2,3,4]))
+
+twentyfour :: Int
+twentyfour = getProduct (foldList (map Product [1,2,3,4]))
+
+
+sortedFromList' :: Ord a => [a] -> SortedList a
+sortedFromList' = foldMapList singleton
+
+sortedListSort' :: Ord a => [a] -> [a]
+sortedListSort' = toList . sortedFromList'
+
+foldMapList :: Monoid m => (a -> m) -> [a] -> m
+foldMapList f a = foldMap f a
+
+-- insertionSort :: Ord a => [a] -> [a]
+-- insertionSort = foldr insert []
+
+-- insert :: Ord a => a -> [a] -> [a]
+-- insert a [] = [a]
+-- insert a [x] = if a >= x then x:[a] else a:[x]
+-- insert a (b:c:cs) | a >= b && a <= c = b:a:c:cs
+--                   | otherwise = b : c : insert a cs
+
+
+count :: Eq a => SortedList a -> SortedList (a, Integer)
+count a = SL [ (b, fromInt y) | x <- vals, y <- [List.length x], b <- [x !! 0] ]
+  where
+    vals = List.group(toList a)
+    fromInt = fromIntegral
+
+
+
+numDistinct :: Ord a => SortedList a -> Int
+numDistinct (SL []) = 0
+numDistinct a = length (fromList (countedOn (toList a)))
+  where
+    countedOn []  = []
+    countedOn [x] = [x]
+    countedOn (x:y:zs)  | x == y = countedOn (y:zs)
+                        | otherwise = x : countedOn (y:zs)
+
 
 minimum :: SortedList a -> Maybe a
+minimum (SL []) = Nothing
 minimum a = Just ((toList a) !! 0)
 instance Ord a => Monoid (SortedList a) where
   mappend :: Ord a => SortedList a -> SortedList a -> SortedList a
@@ -15,7 +63,7 @@ instance Ord a => Monoid (SortedList a) where
       myAppend xs [] = xs
       myAppend [] ys = ys
       myAppend (x:xs) (y:ys)  | x <= y = x : myAppend xs (y:ys)
-                              | otherwise = y : myAppend (x:xs) ys    
+                              | otherwise = y : myAppend (x:xs) ys
   mempty :: Ord a => SortedList a
   mempty = SL []
 
@@ -142,7 +190,7 @@ length (SL xs) = List.length xs
 -- initAlt [] = error "Empty list"
 -- initAlt [a] = [a]
 -- initAlt (x:xs) = reverse (drop 1 (reverse (x:xs)))
-        
+
 
 
 

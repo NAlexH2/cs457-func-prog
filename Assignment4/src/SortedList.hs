@@ -349,12 +349,22 @@ calculating the number of distinct values in the list.
 
 -- TODO: define the following function.
 numDistinct :: Ord a => SortedList a -> Int
-numDistinct = undefined
+numDistinct (SL []) = 0
+numDistinct a = length (fromList (countedOn (toList a)))
+  where
+    countedOn []  = []
+    countedOn [x] = [x]
+    countedOn (x:y:zs)  | x == y    = countedOn (y:zs)
+                        | otherwise = x : countedOn (y:zs)
 
 testNumDistinct :: Test
 testNumDistinct = TestList
- [numDistinct (SL [1::Int,1,3,3,5]) ~?= 3,
-  numDistinct (SL ([]::[Int])) ~?= 0]
+  [
+    numDistinct (SL [1::Int,1,3,3,5]) ~?= 3,
+    numDistinct (SL [1::Int,2,3,4,5]) ~?= 5,
+    numDistinct (SL [1::Int,1,1,1,1]) ~?= 1,
+    numDistinct (SL ([]::[Int])) ~?= 0
+  ]
 
 {-
 We can also count how many times every distinct value occurs in the list:
@@ -362,7 +372,11 @@ We can also count how many times every distinct value occurs in the list:
 
 -- TODO: define the following function.
 count :: Eq a => SortedList a -> SortedList (a, Integer)
-count = undefined
+count a = SL [ (b, fromInt y) | x <- vals, y <- [List.length x], b <- [x !! 0] ]
+  where
+    vals = List.group(toList a)
+    fromInt = fromIntegral
+
 
 {-
 Your implementation of `count` should result in another genuine, legal

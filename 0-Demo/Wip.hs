@@ -1,29 +1,45 @@
 {-# LANGUAGE InstanceSigs #-}
 module Wip where
-import Prelude hiding (foldr, length, filter, minimum)
+import Prelude hiding (foldr, length, filter, minimum,)
 import qualified Data.List as List
-import Data.Monoid
+import Data.Monoid 
+
+data Crispy a = Snap a [a] a
+              | Crackle [[Crispy a]]
+              | Pop Integer deriving (Eq,Show)
+
+instance Foldable Crispy where
+  foldMap f (Snap a bs c) = foldMap f (a:c:bs)
+  foldMap f (Crackle []) = foldMap f []
+  foldMap f (Crackle xs) = foldMap f (foldMap (foldMap f) xs)
+  foldMap f (Pop a) = foldMap f []
 
 
-newtype SortedList a = SL [a] deriving (Eq, Show)
-sumOfProducts :: Num a => [[a]] -> a
-sumOfProducts a = getSum foldMapList getProduct [x | xs <- a, x <- xs]
-
-ten :: Int
-ten = getSum (foldList (map Sum [1,2,3,4]))
-
-twentyfour :: Int
-twentyfour = getProduct (foldList (map Product [1,2,3,4]))
+-- newtype SortedList a = SL [a] deriving (Eq, Show)
 
 
-sortedFromList' :: Ord a => [a] -> SortedList a
-sortedFromList' = foldMapList singleton
 
-sortedListSort' :: Ord a => [a] -> [a]
-sortedListSort' = toList . sortedFromList'
+-- sumOfProducts :: Num a => [[a]] -> a
+-- sumOfProducts a = getSum $ foldMapList 
+--                   Sum [getProduct $ foldMapList Product x | x <- a]
 
-foldMapList :: Monoid m => (a -> m) -> [a] -> m
-foldMapList f a = foldMap f a
+-- foldMapList :: Monoid m => (a -> m) -> [a] -> m
+-- foldMapList f = List.foldr (mappend . f) mempty
+
+-- ten :: Int
+-- ten = getSum (foldList (map Sum [1,2,3,4]))
+
+-- twentyfour :: Int
+-- twentyfour = getProduct (foldList (map Product [1,2,3,4]))
+
+
+-- sortedFromList' :: Ord a => [a] -> SortedList a
+-- sortedFromList' = foldMapList singleton
+
+-- sortedListSort' :: Ord a => [a] -> [a]
+-- sortedListSort' = toList . sortedFromList'
+
+
 
 -- insertionSort :: Ord a => [a] -> [a]
 -- insertionSort = foldr insert []
@@ -35,74 +51,74 @@ foldMapList f a = foldMap f a
 --                   | otherwise = b : c : insert a cs
 
 
-count :: Eq a => SortedList a -> SortedList (a, Integer)
-count a = SL [ (b, fromInt y) | x <- vals, y <- [List.length x], b <- [x !! 0] ]
-  where
-    vals = List.group(toList a)
-    fromInt = fromIntegral
+-- count :: Eq a => SortedList a -> SortedList (a, Integer)
+-- count a = SL [ (b, fromInt y) | x <- vals, y <- [List.length x], b <- [x !! 0] ]
+--   where
+--     vals = List.group(toList a)
+--     fromInt = fromIntegral
 
 
 
-numDistinct :: Ord a => SortedList a -> Int
-numDistinct (SL []) = 0
-numDistinct a = length (fromList (countedOn (toList a)))
-  where
-    countedOn []  = []
-    countedOn [x] = [x]
-    countedOn (x:y:zs)  | x == y = countedOn (y:zs)
-                        | otherwise = x : countedOn (y:zs)
+-- numDistinct :: Ord a => SortedList a -> Int
+-- numDistinct (SL []) = 0
+-- numDistinct a = length (fromList (countedOn (toList a)))
+--   where
+--     countedOn []  = []
+--     countedOn [x] = [x]
+--     countedOn (x:y:zs)  | x == y = countedOn (y:zs)
+--                         | otherwise = x : countedOn (y:zs)
 
 
-minimum :: SortedList a -> Maybe a
-minimum (SL []) = Nothing
-minimum a = Just ((toList a) !! 0)
-instance Ord a => Monoid (SortedList a) where
-  mappend :: Ord a => SortedList a -> SortedList a -> SortedList a
-  l1 `mappend` l2 = SL (myAppend (toList l1) (toList l2))
-    where
-      myAppend xs [] = xs
-      myAppend [] ys = ys
-      myAppend (x:xs) (y:ys)  | x <= y = x : myAppend xs (y:ys)
-                              | otherwise = y : myAppend (x:xs) ys
-  mempty :: Ord a => SortedList a
-  mempty = SL []
+-- minimum :: SortedList a -> Maybe a
+-- minimum (SL []) = Nothing
+-- minimum a = Just ((toList a) !! 0)
+-- instance Ord a => Monoid (SortedList a) where
+--   mappend :: Ord a => SortedList a -> SortedList a -> SortedList a
+--   l1 `mappend` l2 = SL (myAppend (toList l1) (toList l2))
+--     where
+--       myAppend xs [] = xs
+--       myAppend [] ys = ys
+--       myAppend (x:xs) (y:ys)  | x <= y = x : myAppend xs (y:ys)
+--                               | otherwise = y : myAppend (x:xs) ys
+--   mempty :: Ord a => SortedList a
+--   mempty = SL []
 
-instance Ord a => Semigroup (SortedList a) where
-  (<>) :: Ord a => SortedList a -> SortedList a -> SortedList a
-  (<>) = mappend
+-- instance Ord a => Semigroup (SortedList a) where
+--   (<>) :: Ord a => SortedList a -> SortedList a -> SortedList a
+--   (<>) = mappend
 
 
-foldList :: Monoid b => [b] -> b
-foldList = List.foldr mappend mempty
+-- foldList :: Monoid b => [b] -> b
+-- foldList = List.foldr mappend mempty
 
--- | convert to a regular list. The elements should be produced in order.
-toList :: SortedList a -> [a]
-toList (SL as) = as
+-- -- | convert to a regular list. The elements should be produced in order.
+-- toList :: SortedList a -> [a]
+-- toList (SL as) = as
 
--- | convert from a regular list.
-fromList :: Ord a => [a] -> SortedList a
-fromList = foldList . map singleton
+-- -- | convert from a regular list.
+-- fromList :: Ord a => [a] -> SortedList a
+-- fromList = foldList . map singleton
 
-{-
-Some of the operations that we define for sorted lists just delegate
-to the version for regular lists.
--}
+-- {-
+-- Some of the operations that we define for sorted lists just delegate
+-- to the version for regular lists.
+-- -}
 
--- | construct a sorted list containing a single element
-singleton :: a -> SortedList a
-singleton a = SL [a]
+-- -- | construct a sorted list containing a single element
+-- singleton :: a -> SortedList a
+-- singleton a = SL [a]
 
--- | reduce a SortedList in order
-foldr :: (a -> b -> b) -> b -> SortedList a -> b
-foldr f b (SL xs) = List.foldr f b xs
+-- -- | reduce a SortedList in order
+-- foldr :: (a -> b -> b) -> b -> SortedList a -> b
+-- foldr f b (SL xs) = List.foldr f b xs
 
--- | decide which elements of the sorted list to keep
-filter :: (a -> Bool) -> SortedList a -> SortedList a
-filter f (SL xs) = SL (List.filter f xs)
+-- -- | decide which elements of the sorted list to keep
+-- filter :: (a -> Bool) -> SortedList a -> SortedList a
+-- filter f (SL xs) = SL (List.filter f xs)
 
--- | count the number of elements in the sorted list
-length :: SortedList a -> Int
-length (SL xs) = List.length xs
+-- -- | count the number of elements in the sorted list
+-- length :: SortedList a -> Int
+-- length (SL xs) = List.length xs
 
 -- concat :: [[a]] -> [a]
 -- concat [[],[],[]] = []

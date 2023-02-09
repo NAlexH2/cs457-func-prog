@@ -10,8 +10,8 @@ import Test.HUnit ( runTestTT, Test(TestList) )
 
 main :: IO ()
 main = do
-  _ <- runTestTT $ TestList [testSortedFromList']
-  -- _ <- runTestTT $ TestList [testListMonoid, testSortedList, testMinimum, testNumDistinct, testCount]
-  -- _ <- runTestTT $ TestList [testSortedFromList, testSortedFromList', testSumOfProducts,
-  --                            testCrispy, testDivide, testDivideList]
+  -- _ <- runTestTT $ TestList [testSumOfProducts]
+  _ <- runTestTT $ TestList [testListMonoid, testSortedList, testMinimum, testNumDistinct, testCount]
+  _ <- runTestTT $ TestList [testSortedFromList, testSortedFromList', testSumOfProducts,
+                             testCrispy, testDivide, testDivideList]
   return ()

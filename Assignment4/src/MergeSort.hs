@@ -17,6 +17,7 @@ import qualified SortedList as SL
 -- import qualified Data.List as List
 import Data.Monoid
 import Test.HUnit
+import GHC.Base (undefined)
 
 {-
 A warm-up exercise: write the function `insert`, which takes an element and a
@@ -124,7 +125,7 @@ In order to make this work, you need to define the `foldMapList` combinator.
 
 -- TODO: define the following function
 foldMapList :: Monoid m => (a -> m) -> [a] -> m
-foldMapList f a = foldMap f a
+foldMapList f = foldr (mappend . f) mempty
 
 {-
 The type of `foldMapList` is very general---we can use this function to combine
@@ -143,10 +144,12 @@ explicit recursion.
 
 -- TODO: define the following function
 sumOfProducts :: Num a => [[a]] -> a
-sumOfProducts a = foldMapList Sum [Product xs | xs <- a]
+sumOfProducts a = getSum $ foldMapList 
+                  Sum [getProduct $ foldMapList Product x | x <- a]
 
 testSumOfProducts :: Test
-testSumOfProducts = sumOfProducts [[1],[2,3],[4,5,6],[7,8,9,10]] ~?= (5167 :: Int)
+testSumOfProducts = sumOfProducts 
+                    [[1],[2,3],[4,5,6],[7,8,9,10]] ~?= (5167 :: Int)
 
 
 {-
@@ -203,9 +206,14 @@ data Crispy a = Snap a [a] a
               | Crackle [[Crispy a]]
               | Pop Integer deriving (Eq,Show)
 
+
+
 -- TODO: define the following instance
 instance Foldable Crispy where
-  foldMap = undefined
+  foldMap f (Snap a bs c) = foldMap f (a:c:bs)
+  foldMap f (Crackle []) = foldMap f []
+  foldMap f (Crackle xs) = foldMap f (foldMap (foldMap f) xs)
+  foldMap f (Pop a) = foldMap f []
 
 testCrispy :: Test
 testCrispy =
@@ -213,9 +221,11 @@ testCrispy =
       c1 = Snap 700 [] 600
       c2 = Pop 1234567890
       c3 = foldMap (show . subtract 1) (Crackle [[c1], [c2]]) in
-  TestList [ 1300 ~?= getSum (foldMap Sum c1)
-           , 1 ~?= getProduct (foldMap Product c2)
-           , "699599" ~?= c3]
+  TestList [ 
+            1300 ~?= getSum (foldMap Sum c1), 
+            1 ~?= getProduct (foldMap Product c2), 
+            "699599" ~?= c3
+           ]
 
 -------------------------------------------------------------
 

@@ -1,21 +1,50 @@
 {-# LANGUAGE InstanceSigs #-}
 module Wip where
-import Prelude hiding (foldr, length, filter, minimum,)
+import Prelude hiding (foldr, filter, minimum,)
 import qualified Data.List as List
-import Data.Monoid 
+import Data.Monoid
 
-data Crispy a = Snap a [a] a
-              | Crackle [[Crispy a]]
-              | Pop Integer deriving (Eq,Show)
 
-instance Foldable Crispy where
-  foldMap f (Snap a bs c) = foldMap f (a:c:bs)
-  foldMap f (Crackle []) = foldMap f []
-  foldMap f (Crackle xs) = foldMap f (foldMap (foldMap f) xs)
-  foldMap f (Pop a) = foldMap f []
 
 
 -- newtype SortedList a = SL [a] deriving (Eq, Show)
+
+-- foldSort :: (Ord a, Foldable t) => t [a] -> [a]
+-- foldSort a = foldMap sortedListSort a
+
+-- realMergeSort :: Ord a => [a] -> [a]
+-- realMergeSort a = foldSort (DivideList [a])
+
+-- instance Foldable DivideList where
+--   foldMap f xs =
+--     case divide xs of
+--       (DivideList as, DivideList bs) ->  foldMap f as `mappend` foldMap f bs
+
+
+-- newtype DivideList a = DivideList { getDivideList :: [a] } deriving (Eq, Show)
+
+-- divide :: DivideList a -> (DivideList a, DivideList a)
+-- divide (DivideList []) = (DivideList [], DivideList [])
+-- divide (DivideList xs) = (DivideList (take half xs), DivideList (drop half xs))
+--   where
+--     half = List.length xs `div` 2
+
+-- -- divide2 :: DivideList a -> (DivideList a, DivideList a)
+-- -- divide2 (DivideList xs) = getHalf xs
+
+
+-- -- data Crispy a = Snap a [a] a
+-- --               | Crackle [[Crispy a]]
+-- --               | Pop Integer deriving (Eq,Show)
+
+-- -- instance Foldable Crispy where
+-- --   foldMap f (Snap a bs c) = foldMap f (a:c:bs)
+-- --   foldMap f (Crackle []) = foldMap f []
+-- --   foldMap f (Crackle xs) = foldMap (foldMap (foldMap f)) xs
+-- --   foldMap f (Pop a) = foldMap f []
+
+
+
 
 
 
@@ -32,6 +61,11 @@ instance Foldable Crispy where
 -- twentyfour :: Int
 -- twentyfour = getProduct (foldList (map Product [1,2,3,4]))
 
+-- sortedFromList :: Ord a => [a] -> SortedList a
+-- sortedFromList a = fromList a
+
+-- sortedListSort :: Ord a => [a] -> [a]
+-- sortedListSort a = toList (sortedFromList a)
 
 -- sortedFromList' :: Ord a => [a] -> SortedList a
 -- sortedFromList' = foldMapList singleton
@@ -41,8 +75,8 @@ instance Foldable Crispy where
 
 
 
--- insertionSort :: Ord a => [a] -> [a]
--- insertionSort = foldr insert []
+-- -- insertionSort :: Ord a => [a] -> [a]
+-- -- insertionSort = foldr insert []
 
 -- insert :: Ord a => a -> [a] -> [a]
 -- insert a [] = [a]
@@ -59,14 +93,14 @@ instance Foldable Crispy where
 
 
 
--- numDistinct :: Ord a => SortedList a -> Int
--- numDistinct (SL []) = 0
--- numDistinct a = length (fromList (countedOn (toList a)))
---   where
---     countedOn []  = []
---     countedOn [x] = [x]
---     countedOn (x:y:zs)  | x == y = countedOn (y:zs)
---                         | otherwise = x : countedOn (y:zs)
+-- -- numDistinct :: Ord a => SortedList a -> Int
+-- -- numDistinct (SL []) = 0
+-- -- numDistinct a = length (fromList (countedOn (toList a)))
+-- --   where
+-- --     countedOn []  = []
+-- --     countedOn [x] = [x]
+-- --     countedOn (x:y:zs)  | x == y = countedOn (y:zs)
+-- --                         | otherwise = x : countedOn (y:zs)
 
 
 -- minimum :: SortedList a -> Maybe a
@@ -116,7 +150,7 @@ instance Foldable Crispy where
 -- filter :: (a -> Bool) -> SortedList a -> SortedList a
 -- filter f (SL xs) = SL (List.filter f xs)
 
--- -- | count the number of elements in the sorted list
+-- | count the number of elements in the sorted list
 -- length :: SortedList a -> Int
 -- length (SL xs) = List.length xs
 

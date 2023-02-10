@@ -76,7 +76,7 @@ is already defined in the `SortedList` module as `fromList`.)
 -}
 
 sortedFromList :: Ord a => [a] -> SortedList a
-sortedFromList = SL.fromList
+sortedFromList a = SL.fromList a
 
 {-
 By projecting out the underlying list, we get a sorting function, that we'll
@@ -84,7 +84,7 @@ call `sortedListSort`.
 -}
 
 sortedListSort :: Ord a => [a] -> [a]
-sortedListSort = SL.toList . sortedFromList
+sortedListSort a = SL.toList (sortedFromList a)
 
 testSortedFromList :: Test
 testSortedFromList =
@@ -125,7 +125,9 @@ In order to make this work, you need to define the `foldMapList` combinator.
 
 -- TODO: define the following function
 foldMapList :: Monoid m => (a -> m) -> [a] -> m
-foldMapList f = foldr (mappend . f) mempty
+foldMapList f a = foldr distributeMappend mempty a
+  where
+    distributeMappend e r = (f e) `mappend` r
 
 {-
 The type of `foldMapList` is very general---we can use this function to combine
@@ -212,7 +214,7 @@ data Crispy a = Snap a [a] a
 instance Foldable Crispy where
   foldMap f (Snap a bs c) = foldMap f (a:c:bs)
   foldMap f (Crackle []) = foldMap f []
-  foldMap f (Crackle xs) = foldMap f (foldMap (foldMap f) xs)
+  foldMap f (Crackle xs) = foldMap (foldMap (foldMap f)) xs
   foldMap f (Pop a) = foldMap f []
 
 testCrispy :: Test
@@ -250,7 +252,11 @@ middle, returning the result of the split.
 
 -- TODO: define the following function
 divide :: DivideList a -> (DivideList a, DivideList a)
-divide = undefined
+divide (DivideList []) = (DivideList [], DivideList [])
+divide (DivideList xs) = getHalf xs
+  where
+    half = length xs `div` 2
+    getHalf xs =  (DivideList (take half xs), DivideList (drop half xs))
 
 testDivide :: Test
 testDivide = TestList [ divide (DivideList "abcd") ~?=
@@ -271,7 +277,7 @@ slightly non-trivial edge cases.
 instance Foldable DivideList where
   foldMap f xs =
     case divide xs of
-      (DivideList as, DivideList bs) -> undefined
+      (DivideList as, DivideList bs) ->  foldMap f as `mappend` foldMap f bs
 
 testDivideList :: Test
 testDivideList =
@@ -289,8 +295,9 @@ elements located inside an arbitrary `Foldable` structure.
 -}
 
 -- TODO: write down the type signature for ``foldSort` and define the function.
--- foldSort ::
-foldSort = undefined -- implementation should use foldMap
+foldSort :: (Ord a, Foldable t) => t [a] -> [a]
+foldSort a = foldMap sortedListSort a -- implementation should use foldMap
+
 
 {-
 By parameterizing over any `Foldable` container, what we've done is to *factor
@@ -303,8 +310,13 @@ So, while our `sortedListSort` was O(N ^ 2), we can produce a differently
 structured algorithm by instead folding over a `DivideList` instead:
 -}
 
+
 realMergeSort :: Ord a => [a] -> [a]
-realMergeSort = foldSort . DivideList
+realMergeSort a = foldSort (DivideList [a])
+-- I modified this function to make better sense while reading it to myself
+-- was: realMergeSort = foldSort . DivideList
+-- Which I understand, but it feels like just syntactic surgar and slightly
+-- harder to read for a noob.
 
 {-
 If you've done everything correctly, this main function should return rather

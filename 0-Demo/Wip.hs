@@ -7,7 +7,6 @@ import Data.Monoid
 
 
 
--- newtype SortedList a = SL [a] deriving (Eq, Show)
 
 -- foldSort :: (Ord a, Foldable t) => t [a] -> [a]
 -- foldSort a = foldMap sortedListSort a
@@ -106,6 +105,8 @@ import Data.Monoid
 -- minimum :: SortedList a -> Maybe a
 -- minimum (SL []) = Nothing
 -- minimum a = Just ((toList a) !! 0)
+-- newtype SortedList a = SL [a] deriving (Eq, Show)
+
 -- instance Ord a => Monoid (SortedList a) where
 --   mappend :: Ord a => SortedList a -> SortedList a -> SortedList a
 --   l1 `mappend` l2 = SL (myAppend (toList l1) (toList l2))
@@ -150,7 +151,7 @@ import Data.Monoid
 -- filter :: (a -> Bool) -> SortedList a -> SortedList a
 -- filter f (SL xs) = SL (List.filter f xs)
 
--- | count the number of elements in the sorted list
+-- -- | count the number of elements in the sorted list
 -- length :: SortedList a -> Int
 -- length (SL xs) = List.length xs
 

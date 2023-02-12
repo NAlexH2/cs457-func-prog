@@ -1,5 +1,5 @@
-Name:
-Date:
+Name: Alex Harris
+Date: 2/11/2023
 Assignment 5
 
 > module ListPractice where

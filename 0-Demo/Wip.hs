@@ -1,8 +1,7 @@
-{-# LANGUAGE InstanceSigs #-}
+
 module Wip where
-import Prelude hiding (foldr, filter, minimum,)
-import qualified Data.List as List
-import Data.Monoid
+import Prelude hiding (mapM, sequence)
+import qualified Data.Char as Char
 
 
 

@@ -46,6 +46,7 @@ logging s = Log ((), [s])
 
 -- (>>=) :: Log Int -> (Int -> Log Int) -> Log Int
 
+-- writer monad
 instance Monad Log where
   return :: a -> Log a
   return x = Log (x, [])
@@ -64,7 +65,7 @@ plus x y =
   -- Log (x + y, [show x ++ "+" ++ show y ++ "=" ++ show (x + y)])
 
 plus3 :: Int -> Int -> Int -> Log Int
-plus3 x y z = plus x y >>= (\a -> plus a z >>= (\b -> return b))
+plus3 x y z = plus x y >>= (\a -> plus a z)
 -- or
 -- plus3 x y z = do 
 --     a <- plus x y

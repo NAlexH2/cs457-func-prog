@@ -1,11 +1,70 @@
 
 module Wip where
-import Prelude hiding (mapM, sequence)
-import qualified Data.Char as Char
+import Prelude
+import qualified Control.Monad as Monad
+import Data.Map (Map)
+import qualified Data.Map as Map
+import qualified Text.Read as Text
+import Data.Maybe
+
+-- https://hackage.haskell.org/package/containers-0.6.7/docs/Data-Map-Internal.html#v:lookup
+-- https://hackage.haskell.org/package/base-4.17.0.0/docs/Text-Read.html#v:readMaybe
+data Weather = Weather {
+    day :: Int, maxTemp :: Int, minTemp :: Int
+    } deriving (Eq, Show)
+example :: Weather
+example = Weather {day = 2, maxTemp = 78, minTemp = 62}
+
+parseWeather :: Map String String -> Maybe Weather
+parseWeather wMap = do
+      theDay <- Map.lookup "day" wMap
+      hTemp <- Map.lookup "maxTemp" wMap
+      lTemp <- Map.lookup "minTemp" wMap
+      tDM <- Text.readMaybe theDay
+      hTM <- Text.readMaybe hTemp
+      lTM <- Text.readMaybe lTemp
+      return (Weather tDM hTM lTM)
+
+-- scalarProduct :: [Int] -> [Int] -> Int
+-- scalarProduct a b = sum (prodListBuilder a b)
+--   where
+--     prodListBuilder :: [Int] -> [Int] -> [Int]
+--     prodListBuilder j k = do
+--       xys <- [zip j k]
+--       y <- map (\(x,y) -> x * y) xys
+--       return y
+
+-- perfects :: Int -> [Int]
+-- perfects a = do
+--   x <- xs
+--   qualityCheck x
+--   where
+--     xs = [1..a]
+--     qualityCheck x = if x == sum(init(modCheck x xs)) then [x] else []
+--     modCheck n xs =
+--       do
+--         x <- xs
+--         if n `mod` x == 0 then return x else []
+
+-- perfects a = do
+--               xs <- filter (\y -> y == sum( init(factors y))) [1..a]
+--               return xs
+--  where
+--   factors :: Int -> [Int]
+--   factors n = [x | x <- [1..n], n `mod` x == 0]
 
 
 
+-- perfects a  = do filter (\y -> y == sum( init(factors y))) [1..a]
+--  where
+--   factors a = (\n x -> map (n `mod`) x) a [1..a]
+  -- factors n = [x | x <- [1..n], n `mod` x == 0]
 
+listOfTuples :: [(Int,Char)]
+listOfTuples = do
+    n <- [1,2]
+    ch <- ['a','b']
+    return (n,ch)
 
 -- foldSort :: (Ord a, Foldable t) => t [a] -> [a]
 -- foldSort a = foldMap sortedListSort a

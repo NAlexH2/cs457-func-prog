@@ -36,18 +36,33 @@ If the provided dictionary does not have the appropriate data, then the
 function should return `Nothing`. In other words, this function should behave
 according to the examples below.
 
+-- example :: Weather
+-- example = Weather {day = 2, maxTemp = 78, minTemp = 62}
+
 > testParseWeather :: Test
 > testParseWeather = "testParseWeather" ~:
->       TestList [ parseWeather (Map.fromList
->                                [("day", "2"), ("maxTemp", "78"), ("minTemp", "62")])
->                  ~?= Just example,
->                  parseWeather (Map.fromList [("day", "2")]) ~?= Nothing,
->                  parseWeather (Map.fromList
->                               [("day", "two"), ("maxTemp", "78"), ("minTemp", "62")])
->                  ~?= Nothing ]
+>   TestList 
+>   [ 
+>     parseWeather 
+>     (Map.fromList [("day", "2"), ("maxTemp", "78"), ("minTemp", "62")]) ~?= 
+>     Just example,
+>
+>     parseWeather (Map.fromList [("day", "2")]) ~?= Nothing,
+>
+>     parseWeather 
+>     (Map.fromList [("day", "two"), ("maxTemp", "78"), ("minTemp", "62")]) ~?= 
+>     Nothing
+>   ]
 
 > parseWeather :: Map String String -> Maybe Weather
-> parseWeather = undefined
+> parseWeather wMap = do
+>       theDay <- Map.lookup "day" wMap
+>       hTemp <- Map.lookup "maxTemp" wMap
+>       lTemp <- Map.lookup "minTemp" wMap
+>       tDM <- Text.readMaybe theDay
+>       hTM <- Text.readMaybe hTemp
+>       lTM <- Text.readMaybe lTemp
+>       return (Weather tDM hTM lTM)
 
 
 Part 2

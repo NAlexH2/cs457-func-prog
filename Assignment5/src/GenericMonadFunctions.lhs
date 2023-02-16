@@ -72,9 +72,9 @@ the mapped function can return its value in some monad m.
 > foldM :: Monad m => (a -> b -> m a) -> a -> [b] -> m a
 > foldM _ a []     = return a
 > foldM f a (x:xs) = do
->                     b <- f a x --heh
->                     c <- foldM f a xs
->                     return b
+>                     b <- f a x
+>                     b' <- foldM f b xs
+>                     return b'
 
 > testFoldM :: Test
 > testFoldM = TestList [ addEven [1,2,3]  ~=? Nothing,
@@ -111,7 +111,7 @@ the mapped function can return its value in some monad m.
 >    ]
 
 > -- (d) This one is the Kleisli "fish operator"
-> -- My notes: Bind all of g onto x then run f x
+> -- My notes: Bind/run all of g onto all of x then run f x
 
 > (>=>) :: Monad m => (a -> m b) -> (b -> m c) -> a -> m c
 > (>=>) f g x = f x >>= g
@@ -160,13 +160,17 @@ the mapped function can return its value in some monad m.
 
 > -- Thought question: Is the type of `liftM` similar to that of another
 > -- function we've discussed recently?
+> -- Looks like foldMap to me? But Specifically using monad vs foldable.
 
 >
 
 > -- (g) And its two-argument version ...
 
 > liftM2  :: (Monad m) => (a -> b -> r) -> m a -> m b -> m r
-> liftM2 = error "liftM2: unimplemented"
+> liftM2 f a b = do
+>               x <- a
+>               y <- b
+>               return (f x y)
 
 > testLiftM2 :: Test
 > testLiftM2 = TestList [liftM2 (+) (Just (1::Int)) (Just 2) ~=? Just 3,

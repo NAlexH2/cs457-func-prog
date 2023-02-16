@@ -8,6 +8,12 @@ import qualified Text.Read as Text
 
 import Data.Maybe
 
+liftM2  :: (Monad m) => (a -> b -> r) -> m a -> m b -> m r
+liftM2 f a b = do
+              x <- a
+              y <- b
+              return (f x y)
+
 liftM   :: (Monad m) => (a -> b) -> m a -> m b
 liftM f a = do
           x <- a
@@ -32,12 +38,19 @@ sequence (x:xs) = do
 
 
 
--- foldM :: Monad m => (a -> b -> m a) -> a -> [b] -> m a
--- foldM _ a []     = return a
--- foldM f a (x:xs) = do
---                     b <- f a x
---                     c <- foldM f a xs
---                     return b
+foldM :: Monad m => (a -> b -> m a) -> a -> [b] -> m a
+foldM _ a []      = return a
+foldM f a (x:xs) = do
+                    b <- f a x
+                    b' <- foldM f b xs
+                    return b'
+
+addEven :: [Int] -> Maybe Int
+addEven = foldM f 0 where
+               f x y | even x    = Just (x + y)
+                     | otherwise = Nothing
+safeDiv :: Int -> Int -> Maybe Int
+safeDiv x y = if y == 0 then Nothing else Just (x `div` y)
 
 -- sequenceFirst :: Maybe a -> Maybe b -> Maybe a
 -- sequenceFirst x y = x >>= (\a -> case y of

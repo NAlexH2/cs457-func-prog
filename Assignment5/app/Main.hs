@@ -7,7 +7,7 @@ import Test.HUnit
 
 main :: IO ()
 main = do
-  _ <- runTestTT $ TestList [testScalarProduct]
+  _ <- runTestTT $ TestList [testLiftM]
   -- _ <- runTestTT $ TestList [testParseWeather,
   --                            testPerfects, testScalarProduct,
   --                            testMapM, testFoldM, testSequence,

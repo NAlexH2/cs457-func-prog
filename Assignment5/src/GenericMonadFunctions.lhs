@@ -56,18 +56,25 @@ helper functions.
 > testMapM :: Test
 > testMapM = "testMapM" ~:
 >       TestList [ mapM maybeUpper "sjkdhf" ~?= Just "SJKDHF",
->                  mapM maybeUpper "sa2ljsd" ~?= Nothing,
+>                  mapM maybeUpper "sa2ljsd" ~?= Nothing, -- BECAUSE OF THE 2!!!!
 >                  mapM onlyUpper ["QuickCheck", "Haskell"] ~?= ["QH", "CH"],
->                  mapM onlyUpper ["QuickCheck", ""] ~?= []]
+>                  mapM onlyUpper ["QuickCheck", ""] ~?= []
+>                ]
 
 Finally, we observe that this function is a generalization of List.map, where
 the mapped function can return its value in some monad m.
 
 > -- (b)
->
-
+> -- Note: I believe running f, that returned f on a, then a on x.
+> -- From there, recursivly running the function passing in all same stuff till
+> -- reaching base case (similar to mapM)
+ 
 > foldM :: Monad m => (a -> b -> m a) -> a -> [b] -> m a
-> foldM = error "foldM: unimplemented"
+> foldM _ a []     = return a
+> foldM f a (x:xs) = do
+>                     b <- f a x --heh
+>                     c <- foldM f a xs
+>                     return b
 
 > testFoldM :: Test
 > testFoldM = TestList [ addEven [1,2,3]  ~=? Nothing,
@@ -84,10 +91,16 @@ the mapped function can return its value in some monad m.
 >
 
 > -- (c)
->
+> -- Note: Similar to foldM, but in this case, just taking each value and
+> -- compounding it onto a list. There are actually many layers here and
+> -- and kind of neat when REALLY dived into.
 
 > sequence :: Monad m => [m a] -> m [a]
-> sequence = error "sequence: unimplemented"
+> sequence [] = return []
+> sequence (x:xs) = do
+>                 a <- x
+>                 b <- sequence xs
+>                 return (a:b)
 
 > testSequence :: Test
 > testSequence = TestList [
@@ -98,10 +111,10 @@ the mapped function can return its value in some monad m.
 >    ]
 
 > -- (d) This one is the Kleisli "fish operator"
-> --
+> -- My notes: Bind all of g onto x then run f x
 
 > (>=>) :: Monad m => (a -> m b) -> (b -> m c) -> a -> m c
-> (>=>) = error ">=>: unimplemented"
+> (>=>) f g x = f x >>= g
 
 > testKleisli :: Test
 > testKleisli = TestList [ (maybeUpper >=> earlyOrd) 'a' ~=? Just 65
@@ -117,10 +130,14 @@ the mapped function can return its value in some monad m.
 > earlyOrd c = if c < 'm' then Just (Char.ord c) else Nothing
 
 > -- (e)
->
+> -- Note: "Flattening" the list by taking each single element and returning it
+> -- to produce the monadic type
 
 > join :: (Monad m) => m (m a) -> m a
-> join = error "join: unimplemented"
+> join xs = do
+>        x <- xs
+>        r <- x
+>        return r
 
 > testJoin :: Test
 > testJoin = TestList [ join [[1::Int,2],[3,4]] ~=? [1,2,3,4],
@@ -129,10 +146,13 @@ the mapped function can return its value in some monad m.
 >                     ]
 
 > -- (f) Define the 'liftM' function
->
+> -- Note:
 
 > liftM   :: (Monad m) => (a -> b) -> m a -> m b
-> liftM = error "liftM: unimplemented"
+> liftM f a = do
+>          x <- a
+>          return (f x)
+
 
 > testLiftM :: Test
 > testLiftM = TestList [ liftM not (Just True) ~=? Just False,

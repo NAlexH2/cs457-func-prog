@@ -1,29 +1,78 @@
 
 module Wip where
-import Prelude
+import Prelude hiding (mapM, sequence)
 import qualified Control.Monad as Monad
 import Data.Map (Map)
 import qualified Data.Map as Map
 import qualified Text.Read as Text
+
 import Data.Maybe
+
+liftM   :: (Monad m) => (a -> b) -> m a -> m b
+liftM f a = do
+          x <- a
+          return (f x)
+
+join :: (Monad m) => m (m a) -> m a
+join xs = do
+       x <- xs
+       r <- x
+       return r
+
+(>=>) :: Monad m => (a -> m b) -> (b -> m c) -> a -> m c
+(>=>) f g x = f x >>= g
+
+
+sequence :: Monad m => [m a] -> m [a]
+sequence [] = return []
+sequence (x:xs) = do
+                a <- x
+                b <- sequence xs
+                return (a:b)
+
+
+
+-- foldM :: Monad m => (a -> b -> m a) -> a -> [b] -> m a
+-- foldM _ a []     = return a
+-- foldM f a (x:xs) = do
+--                     b <- f a x
+--                     c <- foldM f a xs
+--                     return b
+
+-- sequenceFirst :: Maybe a -> Maybe b -> Maybe a
+-- sequenceFirst x y = x >>= (\a -> case y of
+--                                 Just _ -> x
+--                                 Nothing -> Nothing)
+
+
+-- firstJust :: Maybe a -> Maybe a -> Maybe a
+-- firstJust x y = case x of
+--                   Just _ -> x
+--                   Nothing -> y
+
+-- firstJust x y = if isNothing x == False then x
+--                   else if isNothing y == False then y
+--                   else Nothing 
+
+
 
 -- https://hackage.haskell.org/package/containers-0.6.7/docs/Data-Map-Internal.html#v:lookup
 -- https://hackage.haskell.org/package/base-4.17.0.0/docs/Text-Read.html#v:readMaybe
-data Weather = Weather {
-    day :: Int, maxTemp :: Int, minTemp :: Int
-    } deriving (Eq, Show)
-example :: Weather
-example = Weather {day = 2, maxTemp = 78, minTemp = 62}
+-- data Weather = Weather {
+--     day :: Int, maxTemp :: Int, minTemp :: Int
+--     } deriving (Eq, Show)
+-- example :: Weather
+-- example = Weather {day = 2, maxTemp = 78, minTemp = 62}
 
-parseWeather :: Map String String -> Maybe Weather
-parseWeather wMap = do
-      theDay <- Map.lookup "day" wMap
-      hTemp <- Map.lookup "maxTemp" wMap
-      lTemp <- Map.lookup "minTemp" wMap
-      tDM <- Text.readMaybe theDay
-      hTM <- Text.readMaybe hTemp
-      lTM <- Text.readMaybe lTemp
-      return (Weather tDM hTM lTM)
+-- parseWeather :: Map String String -> Maybe Weather
+-- parseWeather wMap = do
+--       theDay <- Map.lookup "day" wMap
+--       hTemp <- Map.lookup "maxTemp" wMap
+--       lTemp <- Map.lookup "minTemp" wMap
+--       tDM <- Text.readMaybe theDay
+--       hTM <- Text.readMaybe hTemp
+--       lTM <- Text.readMaybe lTemp
+--       return (Weather tDM hTM lTM)
 
 -- scalarProduct :: [Int] -> [Int] -> Int
 -- scalarProduct a b = sum (prodListBuilder a b)
@@ -60,11 +109,11 @@ parseWeather wMap = do
 --   factors a = (\n x -> map (n `mod`) x) a [1..a]
   -- factors n = [x | x <- [1..n], n `mod` x == 0]
 
-listOfTuples :: [(Int,Char)]
-listOfTuples = do
-    n <- [1,2]
-    ch <- ['a','b']
-    return (n,ch)
+-- listOfTuples :: [(Int,Char)]
+-- listOfTuples = do
+--     n <- [1,2]
+--     ch <- ['a','b']
+--     return (n,ch)
 
 -- foldSort :: (Ord a, Foldable t) => t [a] -> [a]
 -- foldSort a = foldMap sortedListSort a

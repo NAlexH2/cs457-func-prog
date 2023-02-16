@@ -84,8 +84,9 @@ Which is which?
 > -- >>> firstJust Nothing Nothing
 > -- Nothing
 > firstJust :: Maybe a -> Maybe a -> Maybe a
-> firstJust = undefined
-
+> firstJust x y = case x of
+>                  Just _ -> x
+>                  Nothing -> y
 
 > -- | Ensure that both Maybes are 'Just' and retain the first one
 > --
@@ -99,4 +100,6 @@ Which is which?
 > -- Nothing
 
 > sequenceFirst :: Maybe a -> Maybe b -> Maybe a
-> sequenceFirst = undefined
+> sequenceFirst x y = x >>= (\a -> case y of
+>                            Just _ -> x
+>                            Nothing -> Nothing)

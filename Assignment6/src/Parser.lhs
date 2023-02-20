@@ -722,6 +722,8 @@ The `many` operation corresponds to running the applicative computation zero or
 more times, whereas `some` runs the computation one or more times. Both return
 their results in a list.
 
+
+
 < many :: Alternative f => f a -> f [a]
 < many v = some v <|> pure []
 
@@ -759,10 +761,9 @@ ghci> doParse oneNat ""
 
 Challenge: use the `Alternative` operators to implement a parser that parses
 zero or more occurrences of `p`, separated by `sep`.
-TODO
 
 > sepBy :: Parser a -> Parser b -> Parser [a]
-> sepBy = undefined
+> sepBy p sep = (:) <$> p <*> some ((*>) sep p) <|> pure []
 
 ~~~~~{.haskell}
 ghci > doParse (sepBy oneNat (char ',')) "1,12,0,3"

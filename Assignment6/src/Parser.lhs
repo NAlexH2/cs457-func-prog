@@ -180,7 +180,11 @@ Note: the following definition is not graded, but you should try implementing
 this function before going on!
 
 > oneDigit :: Parser Int
-> oneDigit = undefined
+> oneDigit = P (\i -> case i of
+>                (n : ns) -> case readMaybe [n] of
+>                               Just x -> Just (x, ns)
+>                               Nothing -> Nothing
+>                []       -> Nothing) 
 
 ~~~~~{.haskell}
 ghci> doParse oneDigit "1"
@@ -211,7 +215,9 @@ Note: the following definition is not graded, but you should try implementing
 this function before going on!
 
 > satisfy :: (Char -> Bool) -> Parser Char
-> satisfy = undefined
+> satisfy f = P (\s -> do
+>                       (c, cs) <- doParse get s
+>                       if f c == True then return (c, cs) else Nothing)
 
 ~~~~~{.haskell}
 ghci> doParse (satisfy isAlpha) "a"
@@ -292,7 +298,9 @@ Of course! Like lists, the type constructor `Parser` is a functor.
 
 > instance Functor Parser where
 >     fmap :: (a -> b) -> Parser a -> Parser b
->     fmap = undefined
+>     fmap f p = P $ \s -> do
+>                   (x, xs) <- doParse p s
+>                   return (f x, xs)
 
 
 With `get`, `satisfy`, `filter`, and `fmap`, we now have a small library
@@ -332,7 +340,9 @@ Nothing
 Finally, finish this parser that should parse just one specific `Char`:
 
 > char :: Char -> Parser Char
-> char = undefined
+> char a = P $ \s -> case s of
+>                (c:cs) -> if c == a then Just (c, cs) else Nothing
+>                []     -> Nothing
 
 ~~~~~~~~~~~{.haskell}
 ghci> doParse (char 'a') "ab"
@@ -368,7 +378,10 @@ returns a new parser that uses first one and then the other and returns the pair
 of resulting values...
 
 > pairP0 ::  Parser a -> Parser b -> Parser (a,b)
-> pairP0 = undefined
+> pairP0 a b = P $ \s -> do
+>                  (a1, as) <- doParse a s
+>                  (b1, bs) <- doParse b as
+>                  return ((a1,b1),bs)
 
 and use that to rewrite `twoChar` more elegantly like this:
 
@@ -407,15 +420,21 @@ instead of passing in the function as a parameter, we get it via parsing.
 
 ~~~~~{.haskell}
 ghci> doParse signedDigit0 "-1"
+Just (-1,"")
 ghci> doParse signedDigit0 "+3"
+Just (3,"")
 ~~~~~
 
 
 Can we generalize this pattern? What is the type when `oneOp` and `oneDigit` are
 arguments to the combinator?
 
+
 > apP :: Parser (t -> a) -> Parser t -> Parser a
-> apP = undefined
+> apP o o' = P $ \s -> do
+>                      (f, cs) <- doParse o s
+>                      (x, cs') <- doParse o' cs
+>                      return (f x, cs')
 
 Does this type look familiar?
 
@@ -452,9 +471,13 @@ Let's go back and reimplement our examples with the applicative combinators:
 
 ~~~~~{.haskell}
 ghci> doParse twoChar "hey!"
+Just (('h','e'),"y!")
 ghci> doParse twoChar ""
+Nothing
 ghci> doParse signedDigit "-1"
+Just (-1,"")
 ghci> doParse signedDigit "+3"
+Just (3,"")
 ~~~~~~
 
 
@@ -519,7 +542,9 @@ make `Parser` an instance of the `Monad` type class. See if you can figure out
 an appropriate definition of `(>>=)`.
 
 > bindP :: Parser a -> (a -> Parser b) -> Parser b
-> bindP = undefined
+> bindP a f = P $ \s -> case doParse a s of
+>                       Just (x, xs) -> doParse (f x) xs
+>                       Nothing      -> Nothing
 
 Recursive Parsing
 -----------------
@@ -540,17 +565,21 @@ Much better!
 
 ~~~~~{.haskell}
 ghci> doParse (string "mic") "mickeyMouse"
+Just ("mic","keyMouse")
 ghci> doParse (string "mic") "donald duck"
+Nothing
 ~~~~~
 
 For fun, try to write `string` using `foldr` for the list recursion.
 
 > string' :: String -> Parser String
-> string' = foldr undefined undefined
+> string' = foldr (\x xs -> (:) <$> char x <*> xs) (pure "")
 
 ~~~~~{.haskell}
 ghci> doParse (string' "mic") "mickeyMouse"
+Just ("mic","keyMouse")
 ghci> doParse (string' "mic") "donald duck"
+Nothing
 ~~~~~
 
 Furthermore, we can use natural number recursion to write a parser that grabs
@@ -678,7 +707,7 @@ For parsers, this means that we need to have a *failure* parser that never
 parses anything (i.e. one that always returns `Nothing`):
 
 > failP :: Parser a
-> failP = undefined
+> failP = P (return Nothing)
 
 Putting these two definitions together gives us the Alternative instance.
 
@@ -730,6 +759,7 @@ ghci> doParse oneNat ""
 
 Challenge: use the `Alternative` operators to implement a parser that parses
 zero or more occurrences of `p`, separated by `sep`.
+TODO
 
 > sepBy :: Parser a -> Parser b -> Parser [a]
 > sepBy = undefined
@@ -763,8 +793,8 @@ First, we parse arithmetic operations as follows:
 > intOp = plus <|> minus <|> times <|> divide
 >   where plus   = char '+' *> pure (+)
 >         minus  = char '-' *> pure (-)
->         times  = undefined
->         divide = undefined
+>         times  = char '*' *> pure (*)
+>         divide = char '/' *> pure (div)
 
 If you are having trouble with `divide`, recall what is the correct divide
 operation on `Int`s?
@@ -845,7 +875,7 @@ and multiplication-like ones.
 Define `mulOp` that parse "*" and "/" similar to `addOp`.
 
 > mulOp :: Parser (Int -> Int -> Int)
-> mulOp = undefined
+> mulOp = char '*' *> pure (*) <|> char '/' *> pure (div)
 
 Now, we can stratify our language into mutually recursive sub-languages, where
 each top-level expression is parsed first as an addition expression (`addE`)
@@ -974,9 +1004,10 @@ operation (`addOp` vs `mulOp`). We simply make those parameters to our
 
 after which we can rewrite the grammar in three lines:
 
+
 > addE2, mulE2, factorE2 :: Parser Int
-> addE2    = undefined   -- Use `chainl1`!
-> mulE2    = undefined   -- Use `chainl1`!
+> addE2    = addE1 <|> oneNat   -- Use `chainl1`!
+> mulE2    = mulE1 <|> oneNat   -- Use `chainl1`!
 > factorE2 = parenP addE2 <|> oneNat
 
 ~~~~~{.haskell}
